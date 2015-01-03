@@ -14,6 +14,8 @@ public class Annealing {
 	
 	public static int[] findSol (int[][] graph, CoolingSchedule coolingSchedule) {
 		
+		long start_time = System.nanoTime();
+		
 		int ver = graph.length;
 		int sumX = 0;  int sumY = 0;
 		//int selWeights = 0 ; 
@@ -28,9 +30,8 @@ public class Annealing {
 		double lambda = 0.6;				//potrzebne dla schladzania liniowego i geometrycznego
 
 		int [][] X = new int[ver][ver]; int [][] Y = new int[ver][ver];
-		int [] tmp = new int[ver]; // MARTA: nie mam pomyslu na nazwe... wektor, dla ktorego i-ty element zawiera numer wierzcholka ze zbioru B, z ktorym polaczony jest i-ty wierzcholek ze zbioru A
-		 							//potrzebne do zachowania zalozonej zlozonosci obliczeniowej! (nie mam innego pomyslu)
-			
+		int [] aNeighbours = new int[ver]; // MARTA: wektor, dla ktorego i-ty element zawiera numer wierzcholka ze zbioru B, z ktorym polaczony jest i-ty wierzcholek ze zbioru A
+		 										
 		if(ver == 1) {
 			sumX = graph[0][0];
 			return new int[Nmax];
@@ -54,7 +55,7 @@ public class Annealing {
 			System.out.println("krawedzie rozw X: (A"+ (a+1)+ ", B" + (b+1) +")" ) ;
 						
 			X[a][b] = graph[a][b];                           // zapisujemy rozw X
-			tmp[a] = b;
+			aNeighbours[a] = b;
 					
 		}
 		System.out.println("sumX : " +sumX);
@@ -69,25 +70,25 @@ public class Annealing {
 				a1 = randGen.nextInt(ver);
 				a2 = randGen.nextInt(ver - 1);
 				if(a2 >= a1) //MARTA: wylosowanie dwoch liczb - zlozonosc O(1) :)
-					++ a2;
+					++ a2; 
 					
 				//z sumX odejmujemy wagi usunietych krawedzi ..
-				sumY = sumX - (graph[a1][tmp[a1]] + graph[a2][tmp[a2]]);
+				sumY = sumX - (graph[a1][aNeighbours[a1]] + graph[a2][aNeighbours[a2]]);
 				//... i dodajemy sumy nowych krawedzi
-				sumY += (graph[a1][tmp[a2]] + graph[a2][tmp[a1]]);
+				sumY += (graph[a1][aNeighbours[a2]] + graph[a2][aNeighbours[a1]]);
 				
 				if(sumX >= sumY) {
 					//usuwamy krawedzie
-					X[a1][tmp[a1]] = 0;
-					X[a2][tmp[a2]] = 0;
+					X[a1][aNeighbours[a1]] = 0;
+					X[a2][aNeighbours[a2]] = 0;
 					//dodajemy nowe
-					X[a1][tmp[a2]] = graph[a1][tmp[a2]];
-					X[a2][tmp[a1]] = graph[a2][tmp[a1]];
+					X[a1][aNeighbours[a2]] = graph[a1][aNeighbours[a2]];
+					X[a2][aNeighbours[a1]] = graph[a2][aNeighbours[a1]];
 					
-					//aktualizujemy wektor bez nazwy
-					final int oldTmpA1 = tmp[a1];
-					tmp[a1] = tmp[a2];
-					tmp[a2] = oldTmpA1;
+					//aktualizujemy wektor z glupia nazwa - dwa wierzcholki zamieniaja sie sasiadami!
+					final int oldTmpA1 = aNeighbours[a1];
+					aNeighbours[a1] = aNeighbours[a2];
+					aNeighbours[a2] = oldTmpA1;
 					
 					sumX = sumY;
 					
@@ -95,19 +96,19 @@ public class Annealing {
 					System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
 				} else {
 					double probability = 1/(1 + Math.exp((sumY - sumX)/T));
-					
-					if (probability > 0.5) { //od 0.5 ??
+					double tmp = randGen.nextDouble();
+					if (probability > tmp) { 
 						//usuwamy krawedzie
-						X[a1][tmp[a1]] = 0;
-						X[a2][tmp[a2]] = 0;
+						X[a1][aNeighbours[a1]] = 0;
+						X[a2][aNeighbours[a2]] = 0;
 						//dodajemy nowe
-						X[a1][tmp[a2]] = graph[a1][tmp[a2]];
-						X[a2][tmp[a1]] = graph[a2][tmp[a1]];
+						X[a1][aNeighbours[a2]] = graph[a1][aNeighbours[a2]];
+						X[a2][aNeighbours[a1]] = graph[a2][aNeighbours[a1]];
 						
-						//aktualizujemy wektor bez nazwy
-						final int oldTmpA1 = tmp[a1];
-						tmp[a1] = tmp[a2];
-						tmp[a2] = oldTmpA1;		
+						//aktualizujemy wektor z glupia nazwa - dwa wierzcholki zamieniaja sie sasiadami!
+						final int oldTmpA1 = aNeighbours[a1];
+						aNeighbours[a1] = aNeighbours[a2];
+						aNeighbours[a2] = oldTmpA1;		
 						
 						sumX = sumY;
 						System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
@@ -121,6 +122,9 @@ public class Annealing {
 			
 		}
 		
+		long end_time = System.nanoTime();
+		
+		System.out.println("Algortym pracowal przez " + (end_time - start_time) + " ns.");
 		int [] results = new int [Nmax]; //
 		
 		
