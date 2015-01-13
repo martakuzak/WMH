@@ -4,6 +4,8 @@ import graph.Generator;
 import graph.GraphReader;
 import alg.Annealing;
 import alg.CoolingSchedule;
+import alg.Result;
+import alg.params.Parameters;
 
 import java.io.FileNotFoundException;
 import java.util.Arrays;
@@ -12,6 +14,9 @@ import java.util.Arrays;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
+
+
 
 import javax.swing.JOptionPane;
 
@@ -135,8 +140,10 @@ public class MainFrame extends javax.swing.JFrame {
 						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
 						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
 						
+						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
+						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
 						//nie wiem jak to ?
-						results =  Annealing.findSol(gg, CoolingSchedule.COOLING_LINEAR);
+						Result result =  Annealing.findSol(gg, params);
 						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_GEOMETRICAL);
 						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_LOGARITHMIC);
 					} catch (FileNotFoundException e) {

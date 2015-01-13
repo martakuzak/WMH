@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.Arrays;
 
+import alg.params.Parameters;
+
 
 
 
@@ -12,7 +14,7 @@ public class Annealing {
 	
 	
 	
-	public static int[] findSol (int[][] graph, CoolingSchedule coolingSchedule) {
+	public static Result findSol (int[][] graph, Parameters params) {
 		
 		long start_time = System.nanoTime();
 		
@@ -22,19 +24,20 @@ public class Annealing {
 
 			
 		
-		double Tmax = 100;                      // temperatura poczatk
-		double Tmin = 10;							//MARTA: temperatura koncowa
-		double T = Tmax;
+		double Tmax = params.getTmax();;                      // temperatura poczatk
+		double Tmin = params.getTmin();							//MARTA: temperatura koncowa
+		double T = Tmax;		
+		int Nmax = params.getNmax();						// max ilosc iteracji
+		double lambda = params.getLambda();				//potrzebne dla schladzania liniowego i geometrycznego
+		CoolingSchedule coolingSchedule = params.getCoolingSchedule();
 		
-		int Nmax = 100;						// max ilosc iteracji
-		double lambda = 0.6;				//potrzebne dla schladzania liniowego i geometrycznego
-
 		int [][] X = new int[ver][ver]; int [][] Y = new int[ver][ver];
 		int [] aNeighbours = new int[ver]; // MARTA: wektor, dla ktorego i-ty element zawiera numer wierzcholka ze zbioru B, z ktorym polaczony jest i-ty wierzcholek ze zbioru A
 		 										
 		if(ver == 1) {
+			long end_time = System.nanoTime();
 			sumX = graph[0][0];
-			return new int[Nmax];
+			return new Result(end_time - start_time, sumX);
 		}
 		 
 		 
@@ -210,7 +213,7 @@ public class Annealing {
 			
 				
 		}*/
-		return results;	
+		return new Result(end_time - start_time, sumX);	
 	}
 
 	
