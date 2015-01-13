@@ -144,20 +144,20 @@ public class MainFrame extends javax.swing.JFrame {
 						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
 						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
 						//nie wiem jak to ?
-						Result result =  AnnealingTestApi.findSol(gg, params);
-						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_GEOMETRICAL);
-						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_LOGARITHMIC);
+						Result result =  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
+
+		                
+		                jTextPane1.append(Arrays.deepToString(dg));
+		                
+		                String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
+		                
+		                jTextPane2.setText(""); //? nie wiem czy to trzeba
+		                jTextPane2.append(res);
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 	
-	                
-	                jTextPane1.append(Arrays.deepToString(dg));
-	                
-	                String res = Annealing.chooseRes(results);
-	                
-	                jTextPane2.append(res);
             }
 
             catch(NumberFormatException e) { //Boze
