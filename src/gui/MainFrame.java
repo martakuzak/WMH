@@ -2,7 +2,7 @@ package gui;
 
 import graph.Generator;
 import graph.GraphReader;
-import alg.Annealing;
+import alg.AnnealingTestApi;
 import alg.CoolingSchedule;
 import alg.Result;
 import alg.params.Parameters;
@@ -14,6 +14,7 @@ import java.util.Arrays;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+
 
 
 
@@ -143,7 +144,7 @@ public class MainFrame extends javax.swing.JFrame {
 						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
 						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
 						//nie wiem jak to ?
-						Result result =  Annealing.findSol(gg, params);
+						Result result =  AnnealingTestApi.findSol(gg, params);
 						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_GEOMETRICAL);
 						//results =  Annealing.findSol(gg, CoolingSchedule.COOLING_LOGARITHMIC);
 					} catch (FileNotFoundException e) {
