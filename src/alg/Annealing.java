@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
 import java.util.Arrays;
+import java.util.Vector;
 
 import alg.params.Parameters;
 
@@ -14,15 +15,13 @@ public class Annealing {
 	
 	
 	
-	public static Result findSol (int[][] graph, Parameters params) {
+	public static Vector<TempResPair> findSol (int[][] graph, Parameters params) {
 		
 		long start_time = System.nanoTime();
 		
 		int ver = graph.length;
 		int sumX = 0;  int sumY = 0;
 		//int selWeights = 0 ; 
-
-			
 		
 		double Tmax = params.getTmax();;                      // temperatura poczatk
 		double Tmin = params.getTmin();							//MARTA: temperatura koncowa
@@ -33,11 +32,15 @@ public class Annealing {
 		
 		int [][] X = new int[ver][ver]; int [][] Y = new int[ver][ver];
 		int [] aNeighbours = new int[ver]; // MARTA: wektor, dla ktorego i-ty element zawiera numer wierzcholka ze zbioru B, z ktorym polaczony jest i-ty wierzcholek ze zbioru A
-		 										
+		 			
+		Vector<TempResPair> tempResPairs = new Vector<>();
+		
 		if(ver == 1) {
 			long end_time = System.nanoTime();
 			sumX = graph[0][0];
-			return new Result(end_time - start_time, sumX);
+			Result result = new Result(end_time - start_time, sumX, X);
+			tempResPairs.add(new TempResPair(Tmax, result));
+			return tempResPairs;
 		}
 		 
 		 
@@ -121,6 +124,9 @@ public class Annealing {
 
 				++ i;
 			}
+			long tmpEndTime = System.nanoTime();
+			Result tmpResult = new Result(tmpEndTime - start_time, sumX, X);
+			tempResPairs.add(new TempResPair(T, tmpResult));
 			T = updateTemp(T, coolingSchedule, lambda, i, Tmax);
 			
 		}
@@ -128,6 +134,13 @@ public class Annealing {
 		long end_time = System.nanoTime();
 		
 		System.out.println("Algortym pracowal przez " + (end_time - start_time) + " ns.");
+		
+		for (int i = 0; i < X.length; ++ i ) {
+			for (int j = 0; j < X.length; ++j) {
+				System.out.print(X[i][j] + "\t");
+			}
+			System.out.println();
+		}
 		int [] results = new int [Nmax]; //
 		
 		
@@ -213,7 +226,7 @@ public class Annealing {
 			
 				
 		}*/
-		return new Result(end_time - start_time, sumX);	
+		return tempResPairs;
 	}
 
 	
