@@ -99,7 +99,7 @@ public class Annealing {
 					sumX = sumY;
 					
 
-					System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
+					//System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
 				} else {
 					double probability = 1/(1 + Math.exp((sumY - sumX)/T));
 					double tmp = randGen.nextDouble();
@@ -117,7 +117,7 @@ public class Annealing {
 						aNeighbours[a2] = oldTmpA1;		
 						
 						sumX = sumY;
-						System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
+						//System.out.println("Temp : " + T + " it : " + i + " sumX : " +sumX);
 					}	
 					
 				}	
@@ -143,89 +143,6 @@ public class Annealing {
 		}
 		int [] results = new int [Nmax]; //
 		
-		
-		
-		// iteracje
-		
-		int i = 1;
-		results [i-1] = sumX;
-		/*while (i < Nmax) {
-			
-				Collections.shuffle(list);
-				int aa = 0; int bb = 0;
-				
-				
-				// wybieranie losowego rozw Y
-				for ( aa = 0; aa < ver; ++ aa) {
-					//int bb = 0;
-					bb = list.get(aa);
-					int selWeights = graph[aa][bb];
-					sumY +=  selWeights;             // rozwiazanie Y (suma wag)
-
-					Y[aa][bb] = graph[aa][bb];          // rozw Y
-				}
-			//	System.out.println("Y: " + Arrays.deepToString(Y) + "sumY : "+sumY);
-				
-				
-				
-				
-				
-				if( sumX > sumY ) {
-					  X = Y;                         // przyjmij Y jako aktualne rozw
-					  sumX = sumY;
-					  results[i] = sumX;
-					  
-					} else {
-						
-						int p =0;
-						if (T != 0 ){
-							 p = (int) (100*(1/(1 + java.lang.Math.exp((sumY-sumX)/T))));      // p-stwo w procentach
-						}
-						else {
-							 p = 0;
-						}
-						
-						// lopatologiczna implementacja fragmentu "przyjmij Y z prawdopodobie�stwem p" ...
-						int [] array = new int [100];
-						for (int r = 0;  r < p; ++r) {
-							array[r]=1;
-						}
-						
-						Random generator = new Random();
-						int indx = generator.nextInt(array.length);
-						
-						
-						if (array[indx]==1){
-							X = Y;
-							sumX = sumY;
-							results[i] = sumX;
-							}
-						else {
-							results[i] = sumX;
-						}
-										
-						}
-						
-				
-				
-				
-				sumY = 0;
-				
-				//zerowanie tablicy Y
-				for (int f=0; f<ver; ++f) {
-					for (int g=0; g<ver; ++g) {
-						Y[f][g] = 0;
-					}
-				}
-
-				// ustalamy temperature
-				T = (int) (0.8*T);                 // chwilowo tak o
-				
-				
-				i++;	
-			
-				
-		}*/
 		return tempResPairs;
 	}
 

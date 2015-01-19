@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.Random;
 
 public class Generator {
-	final static String OUT_DIR = "output/";
+	final static String OUT_DIR = "output";
 
 	public static void generateGraph (int VERTEX_PART_NUMBER, int MIN_WEIGHT, int MAX_WEIGHT) {
 		generateGraph(VERTEX_PART_NUMBER, MIN_WEIGHT, MAX_WEIGHT, OUT_DIR);
@@ -28,7 +28,7 @@ public class Generator {
 		}
 
 		new File(outputDir).mkdir();
-		final File file = new File(outputDir + VERTEX_PART_NUMBER + "_" + MIN_WEIGHT + "_"
+		final File file = new File(outputDir + "/" + VERTEX_PART_NUMBER + "_" + MIN_WEIGHT + "_"
 				+ MAX_WEIGHT + ".txt");
 
 		if (!file.exists()) {

@@ -13,6 +13,14 @@ public class GraphReader {
 				+ "_" + wag_max + ".txt");
 		return readFile(fileName);
 	}
+	
+	public static int[][] readFile(int ilosc_wierz, int wag_min, int wag_max, String outDir) 
+			throws FileNotFoundException {
+		String allFileName = new String(outDir + "/"+ ilosc_wierz + "_" + wag_min
+				+ "_" + wag_max + ".txt");
+		System.out.println(allFileName);
+		return readFile(allFileName);
+	}
 
 	public static int[][] readFile(String fileName)
 			throws FileNotFoundException {

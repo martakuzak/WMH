@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Vector;
 
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 
@@ -221,8 +222,7 @@ public class MainFrame extends javax.swing.JFrame {
  * *************************ZAKLADKA ROZWIAZANIE GRAFU**********************************
  * *************************************************************************************
  */
-        
-        
+         
         jTabbedPane1.addTab("Rozwiazanie grafu", jLayeredPane6);
         
         
@@ -245,7 +245,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jToggleButton11.setText("Generuj graf");
+        jToggleButton11.setText("Generuj graf"); //tylko generacja
         jToggleButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 try{
@@ -276,36 +276,17 @@ public class MainFrame extends javax.swing.JFrame {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-	                
-	                Generator.generateGraph(ilosc_wierz, wag_min, wag_max);
-	                int[][] gg = null;
-	                String [][] dg = null;
-	                int [] results = null;
-	                
-
-	                try {					
-						//if()
-						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
-						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
-						
-						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
-						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
-						//nie wiem jak to ?
-						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
-
-		                
-					//	jTextPane5.append(Arrays.deepToString(dg));
-						jTextPane11.setText(Arrays.deepToString(dg));
-						
-		             //   String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
-		                
-		         //       jTextPane5.setText(""); //? nie wiem czy to trzeba
-		                
-		         //       jTextPane5.append(res);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					
+					JFileChooser chooser = new JFileChooser(); 
+				    chooser.setCurrentDirectory(new java.io.File("."));
+				    chooser.setDialogTitle("Wybierz lokalizacjê wyjœciow¹ pliku");
+				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				    chooser.setAcceptAllFileFilterUsed(false);
+				    
+				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
+				    	String outDir = new String(chooser.getSelectedFile().getAbsolutePath());		                
+		                Generator.generateGraph(ilosc_wierz, wag_min, wag_max, outDir);
+				    }               
 	
             }
 
@@ -338,8 +319,46 @@ public class MainFrame extends javax.swing.JFrame {
 
         jToggleButton12.setText("Uruchom");
         jToggleButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton12ActionPerformed(evt);
+            public void actionPerformed(java.awt.event.ActionEvent evt) {					
+				if(graph1 == null)
+					return;
+				//sprawdzenie poprawnosci parametrow
+				
+				double Tmax = Double.parseDouble(jTextField39.getText());
+				double Tmin = Double.parseDouble(jTextField40.getText());
+				int Nmax = Integer.parseInt(jTextField1.getText());
+				double lambda = Double.parseDouble(jTextField41.getText());
+				
+				if(Tmin <= 0 ) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Temperatura zamrazania powinna byc nieujemna",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				} 
+				
+				if(Tmax <= Tmin) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Temperatura koncowa powinna byc wieksza od poczatkowej",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if(Nmax <= 0) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Paramater Nmax musi byc nieujemny",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+					
+				//sprawdzanie lambda jest zalezne od schematu chlodzenia: dla lin musi byc nieujemny, dla log musi byc pomiedzy <0.5, 1)
+				//trzeba to dodac
+				Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, CoolingSchedule.COOLING_LINEAR);
+				//nie wiem jak to ?
+				Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graph1, params);
+			
             }
         });
 
@@ -348,6 +367,47 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane12.setViewportView(jTextPane12);
 
         jButton6.setText("Wczytaj graf");
+        
+        jButton6.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try{
+					
+					JFileChooser chooser = new JFileChooser(); 
+				    chooser.setCurrentDirectory(new java.io.File("."));
+				    chooser.setDialogTitle("Wybierz plik");
+				    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				    chooser.setAcceptAllFileFilterUsed(false);
+				    
+				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
+		                int[][] gg = null;
+		                String [][] dg = null;
+		                int [] results = null;
+
+		                try {					
+							//if()
+							gg = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());   //graf jako macierz
+							dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
+							
+							graph1 = gg;
+							jTextPane11.setText(Arrays.deepToString(dg));
+		                } catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+	                
+	
+            }
+
+            catch(NumberFormatException e) { //Boze
+            	javax.swing.JOptionPane.showMessageDialog(getParent(), 
+						"Zly format danych wejsciowych",
+						"Blad",
+						JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        });
+        
 
         jLabel2.setText("lub:");
 
@@ -480,12 +540,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         
         
-        
-        
-        
-        
-        
-        
+
         
         
         
@@ -564,45 +619,20 @@ public class MainFrame extends javax.swing.JFrame {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-	                
-					for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
-	                Generator.generateGraph(i, wag_min, wag_max);
-					}
 					
-					
-	                int[][] gg = null;
-	                String [][] dg = null;
-	                int [] results = null;
-	                
-
-	                try {					
-						//if()
-	                	for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
-	                		gg = GraphReader.readFile(i, wag_min, wag_max);
-	                		dg = GraphReader.displayGraph(gg); 
-	                		jTextPane3.setText(Arrays.deepToString(dg));
-	                	}
-						//gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
-						//dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
-						
-						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
-						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
-						//nie wiem jak to ?
-						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
-
-		                
-					//	jTextPane5.append(Arrays.deepToString(dg));
-					//	jTextPane3.setText(Arrays.deepToString(dg));
-						
-		             //   String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
-		                
-		         //       jTextPane5.setText(""); //? nie wiem czy to trzeba
-		                
-		         //       jTextPane5.append(res);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
+					JFileChooser chooser = new JFileChooser(); 
+				    chooser.setCurrentDirectory(new java.io.File("."));
+				    chooser.setDialogTitle("Wybierz lokalizacjê wyjœciow¹ plików");
+				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				    chooser.setAcceptAllFileFilterUsed(false);
+				    
+				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
+				    	String outDir = new String(chooser.getSelectedFile().getAbsolutePath());	
+						for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
+							Generator.generateGraph(i, wag_min, wag_max, outDir);
+						}
+				    } 
+	          				
 	
             }
 
@@ -643,7 +673,47 @@ public class MainFrame extends javax.swing.JFrame {
         jToggleButton4.setText("Uruchom");
         jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton4ActionPerformed(evt);
+                if(graphs2 == null)
+                	return;
+                //sprawdzenie poprawnosci parametrow
+				
+				double Tmax = Double.parseDouble(jTextField10.getText()); 
+				double Tmin = Double.parseDouble(jTextField11.getText());
+				int Nmax = Integer.parseInt(jTextField2.getText());
+				double lambda = Double.parseDouble(jTextField12.getText());
+				
+				if(Tmin <= 0 ) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Temperatura zamrazania powinna byc nieujemna",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				} 
+				
+				if(Tmax <= Tmin) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Temperatura koncowa powinna byc wieksza od poczatkowej",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+
+				if(Nmax <= 0) {
+					javax.swing.JOptionPane.showMessageDialog(getParent(), 
+							"Paramater Nmax musi byc nieujemny",
+							"Blad",
+							JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				//sprawdzanie lambda jest zalezne od schematu chlodzenia: dla lin musi byc nieujemny, dla log musi byc pomiedzy <0.5, 1)
+				//trzeba to dodac
+				
+				for (int idx = 0; idx < graphs2.length; ++ idx) {
+					//dla wszystkich zaznaczonych schematow chlodzenia
+					Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, CoolingSchedule.COOLING_LINEAR);
+					//nie wiem jak to ?
+					Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graphs2[idx], params);
+				}
             }
         });
 
@@ -659,7 +729,38 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel27.setText("Schemat sch³adzania:");
 
-        jButton9.setText("Wczytaj graf");
+        jButton9.setText("Wczytaj grafy");
+        
+        jButton9.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try{
+					JFileChooser chooser = new JFileChooser(); 
+				    chooser.setCurrentDirectory(new java.io.File("."));
+				    chooser.setDialogTitle("Wybierz lokalizacje plikow");
+				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+				    chooser.setAcceptAllFileFilterUsed(false);
+
+	                int[][] gg = null;
+	                String [][] dg = null;
+
+				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
+		                graphs2 = GraphReader.readAllFilesInDir(chooser.getSelectedFile().getAbsolutePath());
+		                
+		                for(int idx = 0; idx < graphs2.length; ++ idx) {
+		                	dg = GraphReader.displayGraph(graphs2[idx]); //nie wiem, jak ustawic gg, skoro tu jest wiele grafow
+							jTextPane11.setText(Arrays.deepToString(dg));
+		                	
+						} 
+				    }
+	                
+                } catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					
+                }                
+	
+                    }
+        });
 
         jLabel6.setText("lub:");
 
@@ -1970,7 +2071,8 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jTextField28ActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
-    }                                            
+    }   
+    
 
     /**
      * @param args the command line arguments
@@ -2170,5 +2272,10 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JToggleButton jToggleButton7;
     private javax.swing.JToggleButton jToggleButton8;
     private javax.swing.JToggleButton jToggleButton9;
-    // End of variables declaration                   
+    // End of variables declaration            
+    private int [][] graph1;
+    private int [][][] graphs2;
+    private int [][] graph3;
+    private int [][] graph4;
+    
 }
