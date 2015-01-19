@@ -2,3 +2,4 @@ bin/
 output/
 .project
 .classpath
+/JavaApplication1/nbproject/private/

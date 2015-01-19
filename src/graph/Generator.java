@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.util.Random;
 
 public class Generator {
-	//final static int VERTEX_PART_NUMBER = 5;
-	//final static int MIN_WEIGHT = 1;
-	//final static int MAX_WEIGHT = 101;
 	final static String OUT_DIR = "output/";
 
-
 	public static void generateGraph (int VERTEX_PART_NUMBER, int MIN_WEIGHT, int MAX_WEIGHT) {
+		generateGraph(VERTEX_PART_NUMBER, MIN_WEIGHT, MAX_WEIGHT, OUT_DIR);
+	}
+
+	public static void generateGraph (int VERTEX_PART_NUMBER, int MIN_WEIGHT, int MAX_WEIGHT, String outputDir) {
 		if (MAX_WEIGHT < MIN_WEIGHT) {
 			System.err
 					.println("MAX_WEIGHT must not be smaller than MIN_WEIGHT");
@@ -27,8 +27,8 @@ public class Generator {
 			return;
 		}
 
-		new File(OUT_DIR).mkdir();
-		final File file = new File(OUT_DIR + VERTEX_PART_NUMBER + "_" + MIN_WEIGHT + "_"
+		new File(outputDir).mkdir();
+		final File file = new File(outputDir + VERTEX_PART_NUMBER + "_" + MIN_WEIGHT + "_"
 				+ MAX_WEIGHT + ".txt");
 
 		if (!file.exists()) {
@@ -58,6 +58,16 @@ public class Generator {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public static void generateGraphs(int MIN_VERTEX_PART_NUMBER, int MAX_VERTEX_PART_NUMBER, int MIN_WEIGHT, int MAX_WEIGHT, String outputDir)  {
+		for (int vpnumber = MIN_VERTEX_PART_NUMBER; vpnumber < MAX_VERTEX_PART_NUMBER; ++ vpnumber)
+			generateGraph(vpnumber, MIN_WEIGHT, MAX_WEIGHT, outputDir);
+		
+	}
+	
+	public static void generateGraphs(int MIN_VERTEX_PART_NUMBER, int MAX_VERTEX_PART_NUMBER, int MIN_WEIGHT, int MAX_WEIGHT)  {
+		generateGraphs(MIN_VERTEX_PART_NUMBER, MAX_VERTEX_PART_NUMBER, MIN_WEIGHT, MAX_WEIGHT, OUT_DIR);
 	}
 
 /*	static String getFileName() {
