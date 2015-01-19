@@ -23,32 +23,16 @@ public class Parameters {
 		return Tmax;
 	}
 
-	public void setTmax(double tmax) {
-		Tmax = tmax;
-	}
-
 	public double getTmin() {
 		return Tmin;
-	}
-
-	public void setTmin(double tmin) {
-		Tmin = tmin;
 	}
 
 	public int getNmax() {
 		return Nmax;
 	}
 
-	public void setNmax(int nmax) {
-		Nmax = nmax;
-	}
-
 	public double getLambda() {
 		return lambda;
-	}
-
-	public void setLambda(double lambda) {
-		this.lambda = lambda;
 	}
 
 	public CoolingSchedule getCoolingSchedule() {

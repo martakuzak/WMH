@@ -45,58 +45,6 @@ public class NmaxParameters {
 				coolingSchedule) : null;
 	}
 
-	public double getTmax() {
-		return Tmax;
-	}
-
-	public void setTmax(double tmax) {
-		Tmax = tmax;
-	}
-
-	public double getTmin() {
-		return Tmin;
-	}
-
-	public void setTmin(double tmin) {
-		Tmin = tmin;
-	}
-
-	public int getNmaxMax() {
-		return NmaxMax;
-	}
-
-	public void setNmaxMax(int nmaxMax) {
-		NmaxMax = nmaxMax;
-	}
-
-	public int getNmaxMin() {
-		return NmaxMin;
-	}
-
-	public void setNmaxMin(int nmaxMin) {
-		NmaxMin = nmaxMin;
-	}
-
-	public double getLambda() {
-		return lambda;
-	}
-
-	public void setLambda(double lambda) {
-		this.lambda = lambda;
-	}
-
-	public double getNmaxStep() {
-		return NmaxStep;
-	}
-
-	public void setNmaxStep(int nmaxStep) {
-		NmaxStep = nmaxStep;
-	}
-
-	public CoolingSchedule getCoolingSchedule() {
-		return coolingSchedule;
-	}
-
 	public void setCoolingSchedule(CoolingSchedule coolingSchedule) {
 		this.coolingSchedule = coolingSchedule;
 	}
