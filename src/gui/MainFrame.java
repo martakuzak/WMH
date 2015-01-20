@@ -6,15 +6,21 @@ import alg.AnnealingTestApi;
 import alg.CoolingSchedule;
 import alg.Result;
 import alg.TempResPair;
+import alg.params.NmaxParameters;
 import alg.params.Parameters;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Vector;
 
+import javax.swing.AbstractButton;
+import javax.swing.ButtonGroup;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 
 
 /*
@@ -132,7 +138,7 @@ public class MainFrame extends javax.swing.JFrame {
         jToggleButton10 = new javax.swing.JToggleButton();
         jLabel44 = new javax.swing.JLabel();
         jScrollPane10 = new javax.swing.JScrollPane();
-        jTextPane10 = new javax.swing.JTextPane();
+        jTextPane10 = new javax.swing.JTextArea();
         filler4 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 10), new java.awt.Dimension(0, 10), new java.awt.Dimension(32767, 10));
         jButton2 = new javax.swing.JButton();
         jButton7 = new javax.swing.JButton();
@@ -207,6 +213,10 @@ public class MainFrame extends javax.swing.JFrame {
         jButton4 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jButton5 = new javax.swing.JButton();
+        jRadioButton15 = new javax.swing.JRadioButton();
+        jRadioButton16 = new javax.swing.JRadioButton();
+        jRadioButton17 = new javax.swing.JRadioButton();
+        jLabel61 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -222,7 +232,8 @@ public class MainFrame extends javax.swing.JFrame {
  * *************************ZAKLADKA ROZWIAZANIE GRAFU**********************************
  * *************************************************************************************
  */
-         
+        
+        
         jTabbedPane1.addTab("Rozwiazanie grafu", jLayeredPane6);
         
         
@@ -245,7 +256,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         });
 
-        jToggleButton11.setText("Generuj graf"); //tylko generacja
+        jToggleButton11.setText("Generuj graf");
         jToggleButton11.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 try{
@@ -276,17 +287,36 @@ public class MainFrame extends javax.swing.JFrame {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
-					
-					JFileChooser chooser = new JFileChooser(); 
-				    chooser.setCurrentDirectory(new java.io.File("."));
-				    chooser.setDialogTitle("Wybierz lokalizacjê wyjœciow¹ pliku");
-				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				    chooser.setAcceptAllFileFilterUsed(false);
-				    
-				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
-				    	String outDir = new String(chooser.getSelectedFile().getAbsolutePath());		                
-		                Generator.generateGraph(ilosc_wierz, wag_min, wag_max, outDir);
-				    }               
+	                
+	                Generator.generateGraph(ilosc_wierz, wag_min, wag_max);
+	                int[][] gg = null;
+	                String [][] dg = null;
+	                int [] results = null;
+	                
+
+	                try {					
+						//if()
+						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
+						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
+						
+						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
+						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
+						//nie wiem jak to ?
+				//		Result result =  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
+
+		                
+					//	jTextPane5.append(Arrays.deepToString(dg));
+						jTextPane11.setText(Arrays.deepToString(dg));
+						
+		             //   String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
+		                
+		         //       jTextPane5.setText(""); //? nie wiem czy to trzeba
+		                
+		         //       jTextPane5.append(res);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	
             }
 
@@ -298,6 +328,7 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
         });
+        
         
         
         
@@ -319,46 +350,8 @@ public class MainFrame extends javax.swing.JFrame {
 
         jToggleButton12.setText("Uruchom");
         jToggleButton12.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {					
-				if(graph1 == null)
-					return;
-				//sprawdzenie poprawnosci parametrow
-				
-				double Tmax = Double.parseDouble(jTextField39.getText());
-				double Tmin = Double.parseDouble(jTextField40.getText());
-				int Nmax = Integer.parseInt(jTextField1.getText());
-				double lambda = Double.parseDouble(jTextField41.getText());
-				
-				if(Tmin <= 0 ) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Temperatura zamrazania powinna byc nieujemna",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				} 
-				
-				if(Tmax <= Tmin) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Temperatura koncowa powinna byc wieksza od poczatkowej",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				if(Nmax <= 0) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Paramater Nmax musi byc nieujemny",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-					
-				//sprawdzanie lambda jest zalezne od schematu chlodzenia: dla lin musi byc nieujemny, dla log musi byc pomiedzy <0.5, 1)
-				//trzeba to dodac
-				Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, CoolingSchedule.COOLING_LINEAR);
-				//nie wiem jak to ?
-				Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graph1, params);
-			
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jToggleButton12ActionPerformed(evt);
             }
         });
 
@@ -367,47 +360,6 @@ public class MainFrame extends javax.swing.JFrame {
         jScrollPane12.setViewportView(jTextPane12);
 
         jButton6.setText("Wczytaj graf");
-        
-        jButton6.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try{
-					
-					JFileChooser chooser = new JFileChooser(); 
-				    chooser.setCurrentDirectory(new java.io.File("."));
-				    chooser.setDialogTitle("Wybierz plik");
-				    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-				    chooser.setAcceptAllFileFilterUsed(false);
-				    
-				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
-		                int[][] gg = null;
-		                String [][] dg = null;
-		                int [] results = null;
-
-		                try {					
-							//if()
-							gg = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());   //graf jako macierz
-							dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
-							
-							graph1 = gg;
-							jTextPane11.setText(Arrays.deepToString(dg));
-		                } catch (FileNotFoundException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-				    }
-	                
-	
-            }
-
-            catch(NumberFormatException e) { //Boze
-            	javax.swing.JOptionPane.showMessageDialog(getParent(), 
-						"Zly format danych wejsciowych",
-						"Blad",
-						JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        });
-        
 
         jLabel2.setText("lub:");
 
@@ -418,6 +370,14 @@ public class MainFrame extends javax.swing.JFrame {
                 jTextField1ActionPerformed(evt);
             }
         });
+
+        jLabel61.setText("Schemat sch³adzania:");
+
+        jRadioButton15.setText("liniowy");
+
+        jRadioButton16.setText("geometryczny");
+
+        jRadioButton17.setText("logarytmiczny");
 
         javax.swing.GroupLayout jLayeredPane6Layout = new javax.swing.GroupLayout(jLayeredPane6);
         jLayeredPane6.setLayout(jLayeredPane6Layout);
@@ -446,21 +406,28 @@ public class MainFrame extends javax.swing.JFrame {
                     .addComponent(jToggleButton11))
                 .addGap(200, 200, 200)
                 .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel53)
-                    .addComponent(jLabel54)
-                    .addComponent(jLabel55)
-                    .addComponent(jToggleButton12)
-                    .addComponent(jLabel56)
-                    .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField39, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
                         .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jRadioButton15)
+                            .addComponent(jRadioButton16)
+                            .addComponent(jRadioButton17)
+                            .addComponent(jLabel61))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jLayeredPane6Layout.createSequentialGroup()
+                        .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel53)
+                            .addComponent(jLabel54)
+                            .addComponent(jLabel55)
+                            .addComponent(jToggleButton12)
+                            .addComponent(jLabel56)
+                            .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField39, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField40, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel7)
                             .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 222, Short.MAX_VALUE)
-                        .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jTextField40, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 83, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jLayeredPane6Layout.setVerticalGroup(
@@ -489,31 +456,43 @@ public class MainFrame extends javax.swing.JFrame {
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jToggleButton11)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(29, 29, 29)
                 .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
                         .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(jButton6))
                         .addGap(18, 18, 18)
-                        .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jScrollPane11))
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
-                        .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(3, 3, 3)
-                        .addComponent(jLabel7)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(35, 35, 35)
-                        .addComponent(jLabel55)
-                        .addGap(18, 18, 18)
-                        .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(76, 76, 76)
+                        .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane6Layout.createSequentialGroup()
+                                .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(241, 241, 241))
+                            .addGroup(jLayeredPane6Layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(jLabel61)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jRadioButton15)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jRadioButton16)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jRadioButton17)
+                                .addGap(31, 31, 31)
+                                .addComponent(jLabel7)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                                .addComponent(jLabel55)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(31, 31, 31)))
                         .addComponent(jToggleButton12)
-                        .addGap(26, 26, 26)
-                        .addComponent(jLabel56)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel56)
+                        .addGap(18, 18, 18)
                         .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(80, 80, 80))
+                .addGap(58, 58, 58))
         );
         jLayeredPane6.setLayer(jLabel50, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jTextField36, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -537,10 +516,18 @@ public class MainFrame extends javax.swing.JFrame {
         jLayeredPane6.setLayer(jLabel2, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jLabel7, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jTextField1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane6.setLayer(jLabel61, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane6.setLayer(jRadioButton15, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane6.setLayer(jRadioButton16, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane6.setLayer(jRadioButton17, javax.swing.JLayeredPane.DEFAULT_LAYER);
         
         
         
-
+        
+        
+        
+        
+        
         
         
         
@@ -619,20 +606,45 @@ public class MainFrame extends javax.swing.JFrame {
 								JOptionPane.ERROR_MESSAGE);
 						return;
 					}
+	                
+					for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
+	                Generator.generateGraph(i, wag_min, wag_max);
+					}
 					
-					JFileChooser chooser = new JFileChooser(); 
-				    chooser.setCurrentDirectory(new java.io.File("."));
-				    chooser.setDialogTitle("Wybierz lokalizacjê wyjœciow¹ plików");
-				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				    chooser.setAcceptAllFileFilterUsed(false);
-				    
-				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
-				    	String outDir = new String(chooser.getSelectedFile().getAbsolutePath());	
-						for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
-							Generator.generateGraph(i, wag_min, wag_max, outDir);
-						}
-				    } 
-	          				
+					
+	                int[][] gg = null;
+	                String [][] dg = null;
+	                int [] results = null;
+	                
+
+	                try {					
+						//if()
+	                	for (int i=ilosc_wierz_min; i<=ilosc_wierz_max; i++ ){
+	                		gg = GraphReader.readFile(i, wag_min, wag_max);
+	                		dg = GraphReader.displayGraph(gg); 
+	                		jTextPane3.setText(Arrays.deepToString(dg));
+	                	}
+						//gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
+						//dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
+						
+						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
+						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
+						//nie wiem jak to ?
+						//Result result =  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
+
+		                
+					//	jTextPane5.append(Arrays.deepToString(dg));
+					//	jTextPane3.setText(Arrays.deepToString(dg));
+						
+		             //   String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
+		                
+		         //       jTextPane5.setText(""); //? nie wiem czy to trzeba
+		                
+		         //       jTextPane5.append(res);
+					} catch (FileNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 	
             }
 
@@ -673,47 +685,7 @@ public class MainFrame extends javax.swing.JFrame {
         jToggleButton4.setText("Uruchom");
         jToggleButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                if(graphs2 == null)
-                	return;
-                //sprawdzenie poprawnosci parametrow
-				
-				double Tmax = Double.parseDouble(jTextField10.getText()); 
-				double Tmin = Double.parseDouble(jTextField11.getText());
-				int Nmax = Integer.parseInt(jTextField2.getText());
-				double lambda = Double.parseDouble(jTextField12.getText());
-				
-				if(Tmin <= 0 ) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Temperatura zamrazania powinna byc nieujemna",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				} 
-				
-				if(Tmax <= Tmin) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Temperatura koncowa powinna byc wieksza od poczatkowej",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-
-				if(Nmax <= 0) {
-					javax.swing.JOptionPane.showMessageDialog(getParent(), 
-							"Paramater Nmax musi byc nieujemny",
-							"Blad",
-							JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				//sprawdzanie lambda jest zalezne od schematu chlodzenia: dla lin musi byc nieujemny, dla log musi byc pomiedzy <0.5, 1)
-				//trzeba to dodac
-				
-				for (int idx = 0; idx < graphs2.length; ++ idx) {
-					//dla wszystkich zaznaczonych schematow chlodzenia
-					Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, CoolingSchedule.COOLING_LINEAR);
-					//nie wiem jak to ?
-					Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graphs2[idx], params);
-				}
+                jToggleButton4ActionPerformed(evt);
             }
         });
 
@@ -729,38 +701,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel27.setText("Schemat sch³adzania:");
 
-        jButton9.setText("Wczytaj grafy");
-        
-        jButton9.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try{
-					JFileChooser chooser = new JFileChooser(); 
-				    chooser.setCurrentDirectory(new java.io.File("."));
-				    chooser.setDialogTitle("Wybierz lokalizacje plikow");
-				    chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				    chooser.setAcceptAllFileFilterUsed(false);
-
-	                int[][] gg = null;
-	                String [][] dg = null;
-
-				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
-		                graphs2 = GraphReader.readAllFilesInDir(chooser.getSelectedFile().getAbsolutePath());
-		                
-		                for(int idx = 0; idx < graphs2.length; ++ idx) {
-		                	dg = GraphReader.displayGraph(graphs2[idx]); //nie wiem, jak ustawic gg, skoro tu jest wiele grafow
-							jTextPane11.setText(Arrays.deepToString(dg));
-		                	
-						} 
-				    }
-	                
-                } catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					
-                }                
-	
-                    }
-        });
+        jButton9.setText("Wczytaj graf");
 
         jLabel6.setText("lub:");
 
@@ -945,8 +886,8 @@ public class MainFrame extends javax.swing.JFrame {
         
         
         
-/* ******************************************************************************
- * ************************* ZAKLADKA WSPOLCZYNNIKI SCHLADZANIA ***************************
+/* ********************************************************************************
+ * ************************* ZAKLADKA WSPOLCZYNNIKI SCHLADZANIA *******************
  **********************************************************************************
 */
         
@@ -1019,10 +960,10 @@ public class MainFrame extends javax.swing.JFrame {
 						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
 						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
 						
-						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
+						//Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
 						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
 						//nie wiem jak to ?
-						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
+					//	Result result =  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
 
 		                
 					//	jTextPane5.append(Arrays.deepToString(dg));
@@ -1355,11 +1296,12 @@ public class MainFrame extends javax.swing.JFrame {
 						//if()
 						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
 						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
+						graph4 = gg;
 						
-						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
+						//Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
 						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
 						//nie wiem jak to ?
-						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
+				//		Result result =  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
 
 		                
 					//	jTextPane5.append(Arrays.deepToString(dg));
@@ -1400,30 +1342,296 @@ public class MainFrame extends javax.swing.JFrame {
 
         jLabel43.setText("Wspó³czynnik sch³adzania: ");
 
+        ButtonGroup group = new ButtonGroup();
+        group.add(jRadioButton9);
+        group.add(jRadioButton13);
+        group.add(jRadioButton14);
+        
+        
         jToggleButton10.setText("Uruchom");
         jToggleButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton10ActionPerformed(evt);
+                try{
+                	int Tmax = Integer.parseInt(jTextField31.getText());
+                	int Tmin = Integer.parseInt(jTextField32.getText());
+                	int nmax_max = Integer.parseInt(jTextField4.getText());
+                	int nmax_min = Integer.parseInt(jTextField3.getText());
+                	int nmax_step = Integer.parseInt(jTextField5.getText());
+                	int lambda = Integer.parseInt(jTextField33.getText());
+                
+	                
+					//sprawdzanie
+                	if(nmax_step <= 0) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Krok nie moze by rowny 0",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+                	
+					if(Tmin < 1) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Temperatura min powinna wynosic co najmniej 1",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(Tmax > 100) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Temperatura max = 100",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(Tmin >= Tmax) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Maksymalna temperatura powinna byc wieksza od minimalnej",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(nmax_min < 1) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"N min powinna wynosic co najmniej 1",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(nmax_max > 100) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"N max = 100",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(nmax_min >= nmax_max) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Nmax powinno byc wieksza od Nmin",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					
+					
+				
+					
+					
+					if (jRadioButton9.isSelected() ) {
+						if(lambda <= 0) {
+							javax.swing.JOptionPane.showMessageDialog(getParent(), 
+									"Lambda musi byc wieksze od 0",
+									"Blad",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+	                }
+					
+					if (jRadioButton13.isSelected() ) {
+						if(lambda <= 0.5) {
+							javax.swing.JOptionPane.showMessageDialog(getParent(), 
+									"Lambda musi byc wieksze od 0.5",
+									"Blad",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+						if(lambda > 0.99) {
+							javax.swing.JOptionPane.showMessageDialog(getParent(), 
+									"Lambda musi byc mniejsze od 1",
+									"Blad",
+									JOptionPane.ERROR_MESSAGE);
+							return;
+						}
+	                }
+					
+
+
+					  int [] tabX4 = new int[nmax_max+1];                        // punkty na os X
+					  int [] tabY4 = new int[nmax_max+1];						// pkty na os Y 
+					  
+					for (int idx = nmax_min ; idx < nmax_max ; idx += nmax_step) {
+						//dla wszystkich zaznaczonych schematow chlodzenia
+						Parameters params = new Parameters(Tmax, Tmin, idx, lambda, CoolingSchedule.COOLING_LINEAR);
+						//nie wiem jak to ?
+						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graph4, params);
+					//	Vector<TempResPair> results = wyniki.at(0);
+			
+						
+					//	jTextPane10.setText(Arrays.deepToString(wyniki.toArray()));
+
+						  
+					
+						for (int i = 0 ; i < wyniki.size(); i++) {
+							TempResPair value = wyniki.get(i);
+							//int m = wyniki.size();
+							
+							  Result ii = value.getResult();
+							  int  g = ii.getSum();
+							  int [][] gg = ii.getGraph();
+							  jTextPane10.append(Arrays.deepToString(gg));
+							  
+							  jTextPane10.append("sum:"+ g);
+							  
+
+							  
+							  tabX4[i] = ii.getSum();
+							  tabY4[i] = i;  
+							  
+							 // System.out.println(Arrays.toString(tabX4));
+							 
+							  
+						}
+						System.out.println(Arrays.toString(tabX4));
+						
+		                JFrame f = new JFrame();
+		                f.add( new Plots(tabX4, tabY4));                
+		                f.setSize(800,600);
+		                f.setLocationRelativeTo(null);
+		                f.setVisible(true);
+						 
+						
+					}
+					
+
+					
+	                
+	              //  Generator.generateGraph(ilosc_wierz, wag_min, wag_max);
+	              //  int[][] gg = null;
+	              //  String [][] dg = null;
+	              //  int [] results = null;
+	                
+
+	                //	jTextPane5.append(Arrays.deepToString(dg));
+				//	jTextPane10.setText("ok");
+	
             }
+
+            catch(NumberFormatException e) { //Boze
+            	javax.swing.JOptionPane.showMessageDialog(getParent(), 
+						"Zly format danych wejsciowych",
+						"Blad",
+						JOptionPane.ERROR_MESSAGE);
+            }
+        }
         });
+        
+        
+        
+        
+        
 
         jLabel44.setText("Rozwi¹zanie:");
 
         jScrollPane10.setViewportView(jTextPane10);
 
         jButton2.setText("Wykres");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) { 
+            
+            	/*
+                JFrame f = new JFrame();
+                
+                System.out.println("tu:   "+Arrays.toString(tabX4));
+                
+                f.add( new Plots(tabX4, tabY4));                
+                f.setSize(800,600);
+                f.setLocationRelativeTo(null);
+                f.setVisible(true);
+                */
+            	
+            }
+            });
+            
+        
+        
+        
+        
 
         jButton7.setText("Wczytaj graf");
+        
+        jButton7.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                try{
+					
+					JFileChooser chooser = new JFileChooser(); 
+				    chooser.setCurrentDirectory(new java.io.File("."));
+				    chooser.setDialogTitle("Wybierz plik");
+				    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				    chooser.setAcceptAllFileFilterUsed(false);
+				    
+				    if (chooser.showOpenDialog(chooser) == JFileChooser.APPROVE_OPTION) { 
+		                int[][] gg = null;
+		                String [][] dg = null;
+		                int [] results = null;
+
+		                try {					
+							//if()
+							gg = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());   //graf jako macierz
+							dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
+							
+							graph4 = gg;
+							
+							jTextPane9.setText(Arrays.deepToString(dg));
+							
+		                } catch (FileNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+				    }
+	                
+	
+            }
+
+            catch(NumberFormatException e) { //Boze
+            	javax.swing.JOptionPane.showMessageDialog(getParent(), 
+						"Zly format danych wejsciowych",
+						"Blad",
+						JOptionPane.ERROR_MESSAGE);
+            }
+        }
+        });
+        
+        
 
         jLabel3.setText("lub:");
 
         jLabel45.setText("Schemat sch³adzania:");
 
+        
+        
         jRadioButton9.setText("liniowy");
+        jRadioButton9.setMnemonic(KeyEvent.VK_P);
 
         jRadioButton13.setText("geometryczny");
+        jRadioButton13.setMnemonic(KeyEvent.VK_P);
 
         jRadioButton14.setText("logarytmiczny");
+        jRadioButton14.setMnemonic(KeyEvent.VK_P);
+        
+        
+        jRadioButton14.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                if (jRadioButton14.isSelected() ) {
+                	jTextField33.setEnabled(false);
+                }
+            }
+        });
+        
+        jRadioButton13.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                if (jRadioButton14.isSelected() ) {
+                }
+            }
+        });
+        
+        jRadioButton9.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                if (jRadioButton14.isSelected() ) {
+                }
+            }
+        });
+        
+        
+        
 
         jLabel57.setText("Iloœæ iteracji Nmax:");
 
@@ -1630,336 +1838,7 @@ public class MainFrame extends javax.swing.JFrame {
         
         
         
-        
-        
-        
-    /**************************************************************
-     * ******************* Zakladka temperatury*******************    
-     ***************************************************************************/
-        
-        jTabbedPane1.addTab("Temperatury", jLayeredPane4);
-        
-
-
-        jLabel26.setText("Liczba wierzcho³ków grafu jednego przedzialu:");
-
-        jTextField20.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField20ActionPerformed(evt);
-            }
-        });
-
-        jLabel28.setText("Zakres wag krawêdzi. Od:");
-
-        jLabel29.setText("do:");
-
-        jTextField22.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField22ActionPerformed(evt);
-            }
-        });
-
-        jToggleButton7.setText("Generuj graf");
-        jToggleButton7.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                try{
-                	int ilosc_wierz = Integer.parseInt(jTextField20.getText());
-                	int wag_min = Integer.parseInt(jTextField21.getText());
-                	int wag_max = Integer.parseInt(jTextField22.getText());
-                
-	                
-					//sprawdzanie
-					if(ilosc_wierz < 1) {
-						javax.swing.JOptionPane.showMessageDialog(getParent(), 
-								"Liczba wierzcholkow jednego przedzialu grafu powinna wynosic co najmniej 1",
-								"Blad",
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if(wag_min < 1) {
-						javax.swing.JOptionPane.showMessageDialog(getParent(), 
-								"Minimalna dozwolona waga krawedzi to 1",
-								"Blad",
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-					if(wag_min >= wag_max) {
-						javax.swing.JOptionPane.showMessageDialog(getParent(), 
-								"Maksymalna waga krawedzi powinna byc wieksza od minimalnej",
-								"Blad",
-								JOptionPane.ERROR_MESSAGE);
-						return;
-					}
-	                
-	                Generator.generateGraph(ilosc_wierz, wag_min, wag_max);
-	                int[][] gg = null;
-	                String [][] dg = null;
-	                int [] results = null;
-	                
-
-	                try {					
-						//if()
-						gg = GraphReader.readFile(ilosc_wierz, wag_min, wag_max);   //graf jako macierz
-						dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
-						
-						Parameters params = new Parameters(100, 40, 100, 0.6, CoolingSchedule.COOLING_LINEAR);
-						//Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolingSchedule);
-						//nie wiem jak to ?
-						Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(gg, params);
-
-		                
-					//	jTextPane5.append(Arrays.deepToString(dg));
-						jTextPane7.setText(Arrays.deepToString(dg));
-						
-		             //   String res = "Suma wag: " + String.valueOf(result.getSum()) + " Czas: " + String.valueOf(result.getNanoTime()) + " ns";
-		                
-		         //       jTextPane5.setText(""); //? nie wiem czy to trzeba
-		                
-		         //       jTextPane5.append(res);
-					} catch (FileNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-	
-            }
-
-            catch(NumberFormatException e) { //Boze
-            	javax.swing.JOptionPane.showMessageDialog(getParent(), 
-						"Zly format danych wejsciowych",
-						"Blad",
-						JOptionPane.ERROR_MESSAGE);
-            }
-        }
-        });
-        
-        
-        
-        
-        
-        
-
-        jScrollPane7.setViewportView(jTextPane7);
-
-        jLabel30.setText("Temperatura pocz¹tkowa Tmax:");
-
-        jLabel31.setText("Temperatura zamra¿ania Tmin:");
-
-        jRadioButton10.setText("liniowy");
-
-        jRadioButton11.setText("geometryczny");
-
-        jRadioButton12.setText("logarytmiczny");
-
-        jLabel32.setText("Wspó³czynnik sch³adzania: ");
-
-        jToggleButton8.setText("Uruchom");
-        jToggleButton8.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jToggleButton8ActionPerformed(evt);
-            }
-        });
-
-        jLabel33.setText("Rozwi¹zanie:");
-
-        jScrollPane8.setViewportView(jTextPane8);
-
-        jLabel34.setText("Schemat sch³adzania:");
-
-        jLabel46.setText("od:");
-
-        jLabel47.setText("do:");
-
-        jLabel48.setText("od:");
-
-        jLabel49.setText("do:");
-
-        jButton4.setText("Wykres");
-
-        jLabel1.setText("lub:");
-
-        jButton5.setText("Wczytaj graf");
-
-        javax.swing.GroupLayout jLayeredPane4Layout = new javax.swing.GroupLayout(jLayeredPane4);
-        jLayeredPane4.setLayout(jLayeredPane4Layout);
-        jLayeredPane4Layout.setHorizontalGroup(
-            jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jToggleButton7)
-                    .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 277, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addComponent(jLabel28)
-                        .addGap(10, 10, 10)
-                        .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabel29)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField22, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane4Layout.createSequentialGroup()
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton5))
-                            .addComponent(jLabel26))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField20, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addGap(163, 163, 163)
-                        .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel34)
-                            .addComponent(jLabel30)
-                            .addComponent(jLabel31)
-                            .addComponent(jRadioButton10)
-                            .addComponent(jRadioButton11)
-                            .addComponent(jRadioButton12)
-                            .addComponent(jLabel32)
-                            .addComponent(jToggleButton8)
-                            .addComponent(jLabel33)
-                            .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 230, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4)
-                            .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane4Layout.createSequentialGroup()
-                                    .addGap(4, 4, 4)
-                                    .addComponent(jLabel48)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jTextField24, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jLabel49)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jTextField35))
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane4Layout.createSequentialGroup()
-                                    .addGap(2, 2, 2)
-                                    .addComponent(jLabel46)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jTextField23, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addComponent(jLabel47)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jTextField34, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addComponent(jTextField25, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addGap(220, 220, 220)
-                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
-        );
-        jLayeredPane4Layout.setVerticalGroup(
-            jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel26)
-                        .addComponent(jTextField20, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel30, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jLabel28)
-                        .addComponent(jTextField21, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel29)
-                        .addComponent(jTextField22, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(jTextField23, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel46)
-                        .addComponent(jLabel47)
-                        .addComponent(jTextField34, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addGap(4, 4, 4)
-                        .addComponent(jLabel31)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextField24, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel48)
-                            .addComponent(jLabel49)
-                            .addComponent(jTextField35, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jToggleButton7)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jButton5))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 36, Short.MAX_VALUE)
-                .addGroup(jLayeredPane4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 382, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(80, 80, 80))
-                    .addGroup(jLayeredPane4Layout.createSequentialGroup()
-                        .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jLabel34)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jRadioButton10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jRadioButton11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jRadioButton12)
-                        .addGap(29, 29, 29)
-                        .addComponent(jLabel32)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jTextField25, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(30, 30, 30)
-                        .addComponent(jToggleButton8)
-                        .addGap(26, 26, 26)
-                        .addComponent(jLabel33)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton4)
-                        .addGap(77, 77, 77))))
-        );
-        jLayeredPane4.setLayer(jLabel26, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField20, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel28, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField21, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel29, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField22, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jToggleButton7, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jScrollPane7, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel30, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField23, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel31, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField24, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jRadioButton10, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jRadioButton11, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jRadioButton12, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel32, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField25, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jToggleButton8, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel33, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jScrollPane8, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel34, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(filler1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel46, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel47, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField34, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel48, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel49, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jTextField35, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jButton4, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jLabel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        jLayeredPane4.setLayer(jButton5, javax.swing.JLayeredPane.DEFAULT_LAYER);
-
-
-
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+ 
         
         
         /******************************************************************************
@@ -2071,8 +1950,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void jTextField28ActionPerformed(java.awt.event.ActionEvent evt) {                                             
         // TODO add your handling code here:
-    }   
-    
+    }                                            
 
     /**
      * @param args the command line arguments
@@ -2252,7 +2130,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
-    private javax.swing.JTextPane jTextPane10;
+    private javax.swing.JTextArea jTextPane10;
     private javax.swing.JTextPane jTextPane11;
     private javax.swing.JTextPane jTextPane12;
     private javax.swing.JTextPane jTextPane3;
@@ -2272,10 +2150,17 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JToggleButton jToggleButton7;
     private javax.swing.JToggleButton jToggleButton8;
     private javax.swing.JToggleButton jToggleButton9;
-    // End of variables declaration            
+    private javax.swing.JLabel jLabel61;
+    private javax.swing.JRadioButton jRadioButton15;
+    private javax.swing.JRadioButton jRadioButton16;
+    private javax.swing.JRadioButton jRadioButton17;
+    // End of variables declaration   
+    
     private int [][] graph1;
     private int [][][] graphs2;
     private int [][] graph3;
     private int [][] graph4;
     
+    private int [] tabX4;
+    private int [] tabY4;
 }

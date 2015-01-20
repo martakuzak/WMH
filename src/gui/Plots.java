@@ -7,13 +7,20 @@ import java.awt.geom.*;
 import javax.swing.*;
  
 public class Plots extends JPanel {
-    int[] data = {
-        21, 14, 18, 03, 86, 88, 74, 87, 54, 77,
-        61, 55, 48, 60, 49, 36, 38, 27, 20, 18
-    };
+  
     final int PAD = 20;
     
- 
+	private int [] dataX ;
+	private int [] dataY;
+	
+	Plots(int [] dataX, int [] dataY) {
+		this.dataX = dataX;
+		this.dataY = dataY;
+	}
+    
+
+    
+    
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
@@ -47,40 +54,33 @@ public class Plots extends JPanel {
         float sx = (w - sw)/2;
         g2.drawString(s, sx, sy);
         // Draw lines.
-        double xInc = (double)(w - 2*PAD)/(data.length-1);
-        double scale = (double)(h - 2*PAD)/getMax(data);
+        double xInc = (double)(w - 2*PAD)/(dataX.length-1);
+        double scale = (double)(h - 2*PAD)/getMax(dataX);
        // g2.setPaint(Color.green.darker());
-        for(int i = 0; i < data.length-1; i++) {
+        for(int i = 0; i < dataX.length-1; i++) {
             double x1 = PAD + i*xInc;
-            double y1 = h - PAD - scale*data[i];
+            double y1 = h - PAD - scale*dataX[i];
             double x2 = PAD + (i+1)*xInc;
-            double y2 = h - PAD - scale*data[i+1];
+            double y2 = h - PAD - scale*dataX[i+1];
             g2.draw(new Line2D.Double(x1, y1, x2, y2));
         }
         // Mark data points.
       //  g2.setPaint(Color.red);
-        for(int i = 0; i < data.length; i++) {
+        for(int i = 0; i < dataX.length; i++) {
             double x = PAD + i*xInc;
-            double y = h - PAD - scale*data[i];
+            double y = h - PAD - scale*dataX[i];
             g2.fill(new Ellipse2D.Double(x-2, y-2, 4, 4));
         }
     }
  
-    private int getMax(int[] data) {
+    private int getMax(int[] dataX) {
         int max = -Integer.MAX_VALUE;
-        for(int i = 0; i < data.length; i++) {
-            if(data[i] > max)
-                max = data[i];
+        for(int i = 0; i < dataX.length; i++) {
+            if(dataX[i] > max)
+                max = dataX[i];
         }
         return max;
     }
- 
-    public static void main(String[] args) {
-        JFrame f = new JFrame();
-        f.add(new Plots());
-        f.setSize(800,600);
-        f.setLocationRelativeTo(null);
-        f.setVisible(true);
-    }
+
     
 }
