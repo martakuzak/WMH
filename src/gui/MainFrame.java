@@ -2117,7 +2117,14 @@ public class MainFrame extends javax.swing.JFrame {
 						return;
 					}
 					
-					
+					if(!jRadioButton9.isSelected() && !jRadioButton13.isSelected()) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Prosze wybrac schemat chlodzenia",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+						
+					}
 				
 					
 					
