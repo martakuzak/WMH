@@ -71,7 +71,7 @@ public class GraphReader {
 
 			}
 		}
-		System.out.println(Arrays.deepToString(tab));
+		//System.out.println(Arrays.deepToString(tab));
 		return tab;
 	}
 
@@ -92,5 +92,32 @@ public class GraphReader {
 		}
 		return ss;
 	}
+	
+
+
+	public static String [] displaySol(int[][] graph) { // macierz
+		// stringów...
+		// suabo...
+
+		int weight = 0;
+		String[][] ss = new String[graph.length][graph.length];
+		String s [] = new String [graph.length];
+
+		for (int i = 0; i < graph.length; ++i) {
+			for (int j = 0; j < graph.length; j++) {
+				int v1 = i;
+				int v2 = j;
+				 weight = graph[i][j];
+				if (weight != 0) {
+				//System.out.print("(A" + v1 + ",B" + v2 +") waga: " +graph[i][j] + ", " + "\n");
+				s [i]= "(A" + (v1+1) + ",B" + (v2+1) +")=" + graph[i][j] +"; " ;
+				}
+			}
+		}
+
+		return s;
+}	
+	
+	
 
 }

@@ -58,13 +58,15 @@ public class Annealing {
 			sumX +=  selWeights;             // rozwiazanie X (suma wag)
 			
 			//System.out.println(Arrays.deepToString(tab));
-			System.out.println("krawedzie rozw X: (A"+ (a+1)+ ", B" + (b+1) +")" ) ;
+			//System.out.println("krawedzie rozw X: (A"+ (a+1)+ ", B" + (b+1) +")" ) ;
 						
 			X[a][b] = graph[a][b];                           // zapisujemy rozw X
 			aNeighbours[a] = b;
 					
 		}
-		System.out.println("sumX : " +sumX);
+		//System.out.println("sumX : " +sumX);
+		
+		int tempIdx = 2;
 		
 		while(T >= Tmin) { //MARTA: zlozonosc w sprawku - komentarz pomocniczy
 			
@@ -127,7 +129,7 @@ public class Annealing {
 			long tmpEndTime = System.nanoTime();
 			Result tmpResult = new Result(tmpEndTime - start_time, sumX, X);
 			tempResPairs.add(new TempResPair(T, tmpResult));
-			T = updateTemp(T, coolingSchedule, lambda, i, Tmax);
+			T = updateTemp(T, coolingSchedule, lambda, ++tempIdx, Tmax);
 			
 		}
 		
@@ -135,12 +137,12 @@ public class Annealing {
 		
 		System.out.println("Algortym pracowal przez " + (end_time - start_time) + " ns.");
 		
-		for (int i = 0; i < X.length; ++ i ) {
+		/*for (int i = 0; i < X.length; ++ i ) {
 			for (int j = 0; j < X.length; ++j) {
 				System.out.print(X[i][j] + "\t");
 			}
 			System.out.println();
-		}
+		}*/
 		int [] results = new int [Nmax]; //
 		
 		return tempResPairs;

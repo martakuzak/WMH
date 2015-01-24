@@ -13,7 +13,7 @@ public class LambdaParameters {
 	private CoolingSchedule coolingSchedule;
 
 	public LambdaParameters(double tmax, double tmin, int nmax,
-			double lambdaMin, double lambdaMax, double lambdaStep) {
+			double lambdaMin, double lambdaMax, double lambdaStep,  CoolingSchedule coolingSchedule) {
 		super();
 		Tmax = tmax;
 		Tmin = tmin;
@@ -21,6 +21,7 @@ public class LambdaParameters {
 		this.lambdaMin = lambdaMin;
 		this.lambdaMax = lambdaMax;
 		this.lambdaStep = lambdaStep;
+		this.coolingSchedule = coolingSchedule;
 	}
 
 	/**
@@ -42,7 +43,8 @@ public class LambdaParameters {
 	 *         lambdaMin>
 	 */
 	public double getLambda(int idx) {
-		double lambda = lambdaMin + (idx - 1) * lambdaStep;
+		double lambda = lambdaMin + idx * lambdaStep;
+		System.out.println("getLambda lambda " + lambda);
 		return (lambda <= lambdaMax) ? lambda : -1;
 	}
 
@@ -53,7 +55,9 @@ public class LambdaParameters {
 	 * @return
 	 */
 	public Parameters getParameters(int lambdaIdx) {
+		System.out.println("lambdaIdx " + lambdaIdx);
 		double lambda = getLambda(lambdaIdx);
+		System.out.println("LAMBDA " + lambda);
 		return (lambda != -1) ? new Parameters(Tmax, Tmin, Nmax,
 				getLambda(lambdaIdx), coolingSchedule) : null;
 	}

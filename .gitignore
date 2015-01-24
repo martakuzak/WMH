@@ -1,5 +1,6 @@
 bin/
 output/
+multi/
 .project
 .classpath
 /JavaApplication1/nbproject/private/

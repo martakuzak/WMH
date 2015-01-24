@@ -12,10 +12,15 @@ public class Plots extends JPanel {
     
 	private int [] dataX ;
 	private int [] dataY;
+	private String xlabel;
+	private String ylabel;
 	
-	Plots(int [] dataX, int [] dataY) {
+	Plots(int [] dataX, int [] dataY, String xlabel, String ylabel) {
 		this.dataX = dataX;
 		this.dataY = dataY;
+		this.xlabel = xlabel;
+		this.ylabel = ylabel;
+		
 	}
     
 
@@ -38,7 +43,7 @@ public class Plots extends JPanel {
         LineMetrics lm = font.getLineMetrics("0", frc);
         float sh = lm.getAscent() + lm.getDescent();
         // Ordinate label.
-        String s = "y";
+        String s = ylabel;
         float sy = PAD + ((h - 2*PAD) - s.length()*sh)/2 + lm.getAscent();
         for(int i = 0; i < s.length(); i++) {
             String letter = String.valueOf(s.charAt(i));
@@ -48,7 +53,7 @@ public class Plots extends JPanel {
             sy += sh;
         }
         // Abcissa label.
-        s = "x";
+        s = xlabel;
         sy = h - PAD + (PAD - sh)/2 + lm.getAscent();
         float sw = (float)font.getStringBounds(s, frc).getWidth();
         float sx = (w - sw)/2;
@@ -56,7 +61,7 @@ public class Plots extends JPanel {
         // Draw lines.
         double xInc = (double)(w - 2*PAD)/(dataX.length-1);
         double scale = (double)(h - 2*PAD)/getMax(dataX);
-       // g2.setPaint(Color.green.darker());
+        g2.setPaint(Color.blue.darker());
         for(int i = 0; i < dataX.length-1; i++) {
             double x1 = PAD + i*xInc;
             double y1 = h - PAD - scale*dataX[i];
@@ -65,7 +70,7 @@ public class Plots extends JPanel {
             g2.draw(new Line2D.Double(x1, y1, x2, y2));
         }
         // Mark data points.
-      //  g2.setPaint(Color.red);
+        g2.setPaint(Color.blue.darker());
         for(int i = 0; i < dataX.length; i++) {
             double x = PAD + i*xInc;
             double y = h - PAD - scale*dataX[i];
