@@ -5,6 +5,7 @@ import graph.GraphReader;
 import alg.Annealing;
 import alg.AnnealingTestApi;
 import alg.CoolingSchedule;
+import alg.FullSearch;
 import alg.Result;
 import alg.TempResPair;
 import alg.params.LambdaParameters;
@@ -446,6 +447,9 @@ public class MainFrame extends javax.swing.JFrame {
 					//trzeba to dodac
 					Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolSched);
 					//nie wiem jak to ?
+					Result bestResult = FullSearch.getBestResult(graph1);
+					System.out.println("NAJLEPSZA SUMA: " + bestResult.getSum());
+			
 					Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graph1, params);
 				
 					
@@ -515,7 +519,7 @@ public class MainFrame extends javax.swing.JFrame {
 
 		                try {					
 							//if()
-							//gg = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());   //graf jako macierz
+							gg = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());   //graf jako macierz
 						//	dg = GraphReader.displayGraph(gg);                          //stringi z inf o grafie (tylko do wyswietlenia)
 							graph1 = GraphReader.readFile(chooser.getSelectedFile().getAbsolutePath());  ;
 							
