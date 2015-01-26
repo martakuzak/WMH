@@ -10,7 +10,7 @@ import alg.params.TmaxParameters;
 
 public class AnnealingTestApi {
 	
-	public static final int NUM_OF_COOL_SCHED = 3;
+	public static final int NUM_OF_ITERATIONS = 10;
 
 	//pierwszy tab?
 	/**
@@ -32,13 +32,19 @@ public class AnnealingTestApi {
 	 * @param params
 	 * @return
 	 */
-	public static Vector<Vector<TempResPair>> findSolMultiGraphsMultiCoolSched(int [][][]graphs, Parameters params) {
+	public static Vector<ResultStats> findSolMultiGraphsMultiCoolSched(int [][][]graphs, Parameters params) {
 		final int numOfGraphs = graphs.length;
-		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
-		for(int graphIdx = 0; graphIdx < numOfGraphs; ++ graphIdx) //po kolei dla wszystkich grafow
-			results.add(findSolOneGraphOneCoolSched(graphs[graphIdx], params));
+		Vector<ResultStats> results= new Vector<>();
+		for(int graphIdx = 0; graphIdx < numOfGraphs; ++ graphIdx) {//po kolei dla wszystkich grafow 
+			Result[] tmpResults = new Result[NUM_OF_ITERATIONS]; 
+			for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) 
+				tmpResults[i] = findSolOneGraphOneCoolSched(graphs[graphIdx], params).lastElement().getResult();
+
+			results.add(getStats(tmpResults, tmpResults[0].getGraph().length));
+		}
 		return results;
 	}
+
 	
 	//trzeci tab?
 	/**
@@ -47,38 +53,85 @@ public class AnnealingTestApi {
 	 * @param params 
 	 * @return
 	 */
-	public static Vector<Vector<TempResPair>> findSolMultiLambdaMultiCoolSched(int [][] graph, LambdaParameters params) {
+	public static Vector<ResultStats> findSolMultiLambdaMultiCoolSched(int [][] graph, LambdaParameters params) {
 		final int numOfLambdas = params.getNumOfLambdas();
-		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
-		for(int lambdaIdx = 0; lambdaIdx < numOfLambdas; ++ lambdaIdx) //po kolei dla wszystkich lambda
-			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(lambdaIdx)));
+		Vector<ResultStats> results= new Vector<>();
+		for(int lambdaIdx = 0; lambdaIdx < numOfLambdas; ++ lambdaIdx) {//po kolei dla wszystkich lambda
+			Result[] tmpResults = new Result[NUM_OF_ITERATIONS]; 
+			for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) 
+				tmpResults[i] =	findSolOneGraphOneCoolSched(graph, params.getParameters(lambdaIdx)).lastElement().getResult();
+			results.add(getStats(tmpResults, tmpResults[0].getGraph().length));
+		}
 		return results;
 	}
 	
 	//czwarty tab?
-	public static Vector<Vector<TempResPair>> findSolMultiNmaxMultiCoolSched(int [][] graph, NmaxParameters params) {
+	public static Vector<ResultStats> findSolMultiNmaxMultiCoolSched(int [][] graph, NmaxParameters params) {
 		final int numOfNmaxs = params.getNmaxNum();
-		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
-		for(int nmaxIdx = 0; nmaxIdx < numOfNmaxs; ++ nmaxIdx) //po kolei dla wszystkich nmax
-			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(nmaxIdx)));
+		Vector<ResultStats> results= new Vector<>();
+		for(int nmaxIdx = 0; nmaxIdx < numOfNmaxs; ++ nmaxIdx) {//po kolei dla wszystkich nmax
+			Result[] tmpResults = new Result[NUM_OF_ITERATIONS]; 
+			for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) 
+				tmpResults[i] = findSolOneGraphOneCoolSched(graph, params.getParameters(nmaxIdx)).lastElement().getResult();
+			results.add(getStats(tmpResults, tmpResults[0].getGraph().length));
+		}
 		return results;
 		
 	}
 	
 	//piaty tab?
-	public static Vector<Vector<TempResPair>> findSolMultiTempMinMultiCoolSched(int [][] graph, TminParameters params) {
+	public static Vector<ResultStats> findSolMultiTempMinMultiCoolSched(int [][] graph, TminParameters params) {
 		final int numOfTmins = params.getTminNum();
-		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
-		for(int tminIdx = 0; tminIdx < numOfTmins; ++ tminIdx) //po kolei dla wszystkich tmin
-			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(tminIdx)));
+		Vector<ResultStats> results= new Vector<>();
+		for(int tminIdx = 0; tminIdx < numOfTmins; ++ tminIdx) {//po kolei dla wszystkich tmin
+			Result[] tmpResults = new Result[NUM_OF_ITERATIONS]; 
+			for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) 
+				tmpResults[i] = findSolOneGraphOneCoolSched(graph, params.getParameters(tminIdx)).lastElement().getResult();
+			results.add(getStats(tmpResults, tmpResults[0].getGraph().length));
+		}
 		return results;
 	}
 	
-	public static Vector<Vector<TempResPair>> findSolMultiTempMaxMultiCoolSched(int [][] graph, TmaxParameters params) {
+	public static Vector<ResultStats> findSolMultiTempMaxMultiCoolSched(int [][] graph, TmaxParameters params) {
 		final int numOfTmax = params.getTmaxNum();
-		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
-		for(int tmaxIdx = 0; tmaxIdx < numOfTmax; ++ tmaxIdx) //po kolei dla wszystkich tmax
-			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(tmaxIdx)));
+		Vector<ResultStats> results= new Vector<>();
+		for(int tmaxIdx = 0; tmaxIdx < numOfTmax; ++ tmaxIdx) {//po kolei dla wszystkich tmax
+			Result[] tmpResults = new Result[NUM_OF_ITERATIONS]; 
+			for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) 
+				tmpResults[i] = findSolOneGraphOneCoolSched(graph, params.getParameters(tmaxIdx)).lastElement().getResult();
+			results.add(getStats(tmpResults, tmpResults[0].getGraph().length));
+		}
 		return results;
+	}
+	
+	/**
+	 * 
+	 * @param results
+	 * @return 
+	 */
+	
+	private static ResultStats getStats(Result[] results, int graphSize) {
+		ResultStats stats;
+		int sumSum = 0;
+		long timeSum = 0;
+		for(int i = 0; i < NUM_OF_ITERATIONS; ++ i) {
+			Result tmpResult = results[i];
+			sumSum += tmpResult.getSum();
+			timeSum += tmpResult.getNanoTime();
+		}
+		//obliczenie sredniej
+		int meanSum = (int) Math.round(sumSum / NUM_OF_ITERATIONS);
+		long meanTime = Math.round(timeSum / NUM_OF_ITERATIONS);
+		//liczenie odchylenia standardowe
+		int sumStandDevSum = 0;
+		int timeStandDevSum = 0;
+		for (int i = 0; i < NUM_OF_ITERATIONS; ++ i) { 
+			sumStandDevSum += Math.pow(results[i].getSum() - meanSum, 2);
+			timeStandDevSum += Math.pow(results[i].getNanoTime() - meanTime, 2);
+		}
+		double sumStandDev =  Math.pow(sumStandDevSum/NUM_OF_ITERATIONS, 0.5);
+		double timeStandDev = Math.pow(timeStandDevSum/NUM_OF_ITERATIONS, 0.5);
+		stats = new ResultStats(meanSum, sumStandDev, meanTime, timeStandDev, graphSize);
+		return stats;
 	}
 }

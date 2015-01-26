@@ -28,7 +28,7 @@ public class TminParameters {
 
 	public int getTminNum() {
 		Double d = (TminMax - TminMin) / TStep;
-		return d.intValue();
+		return (int) Math.round(d);
 	}
 
 	public double getTmin(int idx) {

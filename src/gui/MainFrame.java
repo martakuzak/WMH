@@ -7,17 +7,21 @@ import alg.AnnealingTestApi;
 import alg.CoolingSchedule;
 import alg.FullSearch;
 import alg.Result;
+import alg.ResultStats;
 import alg.TempResPair;
 import alg.params.LambdaParameters;
 import alg.params.NmaxParameters;
 import alg.params.Parameters;
 import alg.params.TminParameters;
 
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Vector;
 
 import javax.swing.AbstractButton;
@@ -197,6 +201,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel29 = new javax.swing.JLabel();
         jTextField22 = new javax.swing.JTextField();
         jToggleButton7 = new javax.swing.JToggleButton();
+        jToggleButton1 = new javax.swing.JToggleButton();
         jScrollPane7 = new javax.swing.JScrollPane();
         jTextPane7 = new javax.swing.JTextArea();
         jLabel30 = new javax.swing.JLabel();
@@ -448,7 +453,6 @@ public class MainFrame extends javax.swing.JFrame {
 					Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolSched);
 					//nie wiem jak to ?
 					Result bestResult = FullSearch.getBestResult(graph1);
-					System.out.println("NAJLEPSZA SUMA: " + bestResult.getSum());
 			
 					Vector<TempResPair> wyniki=  AnnealingTestApi.findSolOneGraphOneCoolSched(graph1, params);
 				
@@ -458,6 +462,28 @@ public class MainFrame extends javax.swing.JFrame {
 					int  g = tmpResult.getSum();
 						  
 					int[][] rozw = tmpResult.getGraph();
+					
+					
+					double [] XX = new double [wyniki.size()];
+					double [] YY = new double [wyniki.size()];
+					
+					
+					
+					for (int i = 0; i < wyniki.size(); i++) {
+						
+					TempResPair  allResults = wyniki.get(i);                  // wyniki tymczasowe dla wszystkich temp
+					double sum = allResults.getResult().getSum();
+					double temp = allResults.getTemp();
+					
+					XX[i] = temp;
+					YY[i] = sum;
+					
+					}
+					
+					X = XX;
+					Y = YY;
+					
+					
 					
 					jTextPane12.append("Rozwiazanie: " + "\n");
 					
@@ -471,6 +497,8 @@ public class MainFrame extends javax.swing.JFrame {
 					
 					jTextPane12.append("\n");
 					jTextPane12.append("Suma wag: " + g +"\n");
+					jTextPane12.append("NAJLEPSZA SUMA (FullSearch): " + bestResult.getSum() +"\n" );
+					
 					if (t/1000000 > 1) {
 					jTextPane12.append("Czas :" + t/1000000 + "ms");
 					}
@@ -580,6 +608,30 @@ public class MainFrame extends javax.swing.JFrame {
         jRadioButton17.setText("logarytmiczny");
         
         
+
+        jToggleButton1.setText("Wykres");
+        jToggleButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	
+                JFrame f = new JFrame("Posrednie rozwiazania dla kolejnych temperatur");
+                Plot2DPanel plot = new Plot2DPanel();           
+                // add a line plot to the PlotPanel
+                
+                System.out.println(Arrays.toString(Y));
+                plot.addLinePlot("my plot", coolSched.getColor(),X, Y);
+                plot.setAxisLabel(0, "temperatura");
+                plot.setAxisLabel(1, "suma wag");
+                f.add(plot);
+                //f.add( new Plots(tabY2, tabX2, "rozmiar grafu", "suma wag"));                
+                f.setSize(800,600);
+                f.setLocationRelativeTo(null);
+                f.setVisible(true);
+            	
+            	
+            }
+        });
+        
+        
         
         
         jRadioButton15.addActionListener(new ActionListener(){
@@ -666,8 +718,9 @@ public class MainFrame extends javax.swing.JFrame {
                             .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jTextField40, javax.swing.GroupLayout.PREFERRED_SIZE, 75, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel7)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 83, Short.MAX_VALUE)))
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jToggleButton1))
+                        .addGap(0, 163, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jLayeredPane6Layout.setVerticalGroup(
@@ -697,43 +750,43 @@ public class MainFrame extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jToggleButton11)))
                 .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jLayeredPane6Layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel61)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jRadioButton15)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jRadioButton16)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jRadioButton17)
+                        .addGap(18, 18, 18)
+                        .addComponent(jLabel7)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel55)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jToggleButton12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel56)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jScrollPane12)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jToggleButton1))
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
-                        .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jLayeredPane6Layout.createSequentialGroup()
-                                .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(586, 586, 586))
-                            .addGroup(jLayeredPane6Layout.createSequentialGroup()
-                                .addComponent(jLabel61)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jRadioButton15)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jRadioButton16)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jRadioButton17)
-                                .addGap(32, 32, 32)
-                                .addComponent(jLabel7)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(29, 29, 29)
-                                .addComponent(jLabel55)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(jTextField41, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jToggleButton12)
-                                .addGap(18, 18, 18)
-                                .addComponent(jLabel56)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jScrollPane12, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addContainerGap())))
+                        .addComponent(filler5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(415, 415, 415))
                     .addGroup(jLayeredPane6Layout.createSequentialGroup()
                         .addGap(18, 18, 18)
                         .addGroup(jLayeredPane6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel2)
                             .addComponent(jButton6))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(171, 171, 171))))
+                        .addComponent(jScrollPane11, javax.swing.GroupLayout.PREFERRED_SIZE, 376, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(171, 171, 171))
         );
         jLayeredPane6.setLayer(jLabel50, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jTextField36, javax.swing.JLayeredPane.DEFAULT_LAYER);
@@ -761,7 +814,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLayeredPane6.setLayer(jRadioButton15, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jRadioButton16, javax.swing.JLayeredPane.DEFAULT_LAYER);
         jLayeredPane6.setLayer(jRadioButton17, javax.swing.JLayeredPane.DEFAULT_LAYER);
-        
+        jLayeredPane6.setLayer(jToggleButton1, javax.swing.JLayeredPane.DEFAULT_LAYER);
         
         
         
@@ -1030,23 +1083,21 @@ public class MainFrame extends javax.swing.JFrame {
 				//double [] tabY2 = new double[graphs2.length];
 				double[][] tabTime2 = new double[2][graphs2.length];
 				
-				Vector< Vector<TempResPair> >  wyniki = AnnealingTestApi.findSolMultiGraphsMultiCoolSched(graphs2, params);
+				Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiGraphsMultiCoolSched(graphs2, params);
 				
 				int tmp_idx = 0;
 				
 				for (int idx =  0; idx < graphs2.length ; idx ++) {
 					
-					Vector <TempResPair> vecTmp = wyniki.get(tmp_idx);
+					ResultStats tmpResult = wyniki.get(tmp_idx);
 					//wynik dla Tmin:
-					Result tmpResult = vecTmp.lastElement().getResult();
 					
-					long t = vecTmp.lastElement().getResult().getNanoTime();
-					int  g = tmpResult.getSum();
-					int [][] gg = tmpResult.getGraph();
+					long t = tmpResult.getTimeMean();
+					int  g = tmpResult.getSumMean();
 					//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
-					tabX2[0][tmp_idx] = 2*gg.length; //rozmiar grafu
+					tabX2[0][tmp_idx] = 2*tmpResult.getGraphSize(); //rozmiar grafu
 					tabX2[1][tmp_idx] = g;	
-					tabTime2[0][tmp_idx] = 2*gg.length;
+					tabTime2[0][tmp_idx] = 2*tmpResult.getGraphSize();
 					tabTime2[1][tmp_idx] = t;
 							
 					//System.out.println(Arrays.deepToString(gg));
@@ -1071,17 +1122,17 @@ public class MainFrame extends javax.swing.JFrame {
 				}
 				  
 				
-                JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych rozmiarów grafów");
+              //  JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych rozmiarów grafów");
                 Plot2DPanel plot = new Plot2DPanel();           
                 // add a line plot to the PlotPanel
                 plot.addLinePlot("my plot", coolSched.getColor(), tabX2);
                 plot.setAxisLabel(0, "n");
                 plot.setAxisLabel(1, "suma wag");
-                f.add(plot);
+            //    f.add(plot);
                 //f.add( new Plots(tabY2, tabX2, "rozmiar grafu", "suma wag"));                
-                f.setSize(800,600);
-                f.setLocationRelativeTo(null);
-                f.setVisible(true);
+             //   f.setSize(800,600);
+             //   f.setLocationRelativeTo(null);
+            //    f.setVisible(true);
                 
                 JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu dla ró¿nych rozmiarów grafów");
                 Plot2DPanel plot2 = new Plot2DPanel();     
@@ -1616,18 +1667,16 @@ public class MainFrame extends javax.swing.JFrame {
 					//double [] tabY3 = new double[params.getNumOfLambdas()];
 					double[][] tabTime3 = new double[2][params.getNumOfLambdas()];
 					
-					Vector< Vector<TempResPair> >  wyniki = AnnealingTestApi.findSolMultiLambdaMultiCoolSched(graph3, params);
+					Vector<ResultStats >  wyniki = AnnealingTestApi.findSolMultiLambdaMultiCoolSched(graph3, params);
 					
 					int tmp_idx = 0;
 					for (double idx = lambda_min ; idx < lambda_max ; idx += lambda_step) {
 						
-						Vector <TempResPair> vecTmp = wyniki.get(tmp_idx);
-
-						Result tmpResult = vecTmp.lastElement().getResult();
+						ResultStats tmpResult = wyniki.get(tmp_idx);
 						
-						long t = vecTmp.lastElement().getResult().getNanoTime();
-						int  g = tmpResult.getSum();
-						int [][] gg = tmpResult.getGraph();
+						long t = tmpResult.getTimeMean();
+						int  g = tmpResult.getSumMean();
+						//int [][] gg = tmpResult.getGraph();
 						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
 						//tabX3[tmp_idx] = idx;
 						tabX3[0][tmp_idx] = idx;
@@ -2201,17 +2250,16 @@ public class MainFrame extends javax.swing.JFrame {
 					//double [] tabY4 = new double[params.getNmaxNum()];
 					double [][] tabTime4 = new double[2][params.getNmaxNum()];
 					
-					Vector< Vector<TempResPair> >  wyniki = AnnealingTestApi.findSolMultiNmaxMultiCoolSched(graph4, params);
+					Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiNmaxMultiCoolSched(graph4, params);
 					
 					int tmp_idx = 0;
 					for (int idx = nmax_min ; idx < nmax_max ; idx += nmax_step) {
-						Vector <TempResPair> vecTmp = wyniki.get(tmp_idx);
+						ResultStats tmpResult = wyniki.get(tmp_idx);
 						//wynik dla Tmin:
-						Result tmpResult = vecTmp.lastElement().getResult();
 						
-						long t = vecTmp.lastElement().getResult().getNanoTime();
-						int  g = tmpResult.getSum();
-						int [][] gg = tmpResult.getGraph();
+						long t = tmpResult.getTimeMean();
+						int  g = tmpResult.getSumMean();
+						//int [][] gg = tmpResult.getGraph();
 						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
 						tabX4[0][tmp_idx] = idx;
 						tabX4[1][tmp_idx] = g;	
@@ -2917,17 +2965,15 @@ public class MainFrame extends javax.swing.JFrame {
 					double [][] tabTime5 = new double[2][params.getTminNum()];
 					
 					
-					Vector< Vector<TempResPair> >  wyniki = AnnealingTestApi.findSolMultiTempMinMultiCoolSched(graph5, params);
+					Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiTempMinMultiCoolSched(graph5, params);
 					
 					int tmp_idx = 0;
 					for (double idx = Tmin_min ; idx < Tmin_max ; idx += TStep) {
-						Vector <TempResPair> vecTmp = wyniki.get(tmp_idx);
+						ResultStats tmpResult = wyniki.get(tmp_idx);
 						//wynik dla Tmin:
-						Result tmpResult = vecTmp.lastElement().getResult();
-						
-						long t = vecTmp.lastElement().getResult().getNanoTime();
-						int  g = tmpResult.getSum();
-						int [][] gg = tmpResult.getGraph();
+						long t = tmpResult.getTimeMean();
+						int  g = tmpResult.getSumMean();
+						//int [][] gg = tmpResult.getGraph();
 						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
 						tabX5[0][tmp_idx] = idx;
 						tabX5[1][tmp_idx] = g;
@@ -2940,14 +2986,14 @@ public class MainFrame extends javax.swing.JFrame {
 						  
 						System.out.println("Graf dla temp min = " + idx + "\n");
 						
-						for (int x = 0; x < gg.length; x++) {
+			//			for (int x = 0; x < gg.length; x++) {
 							 //  System.out.print(GraphReader.displaySol(gg)[i] + ", ");
-							System.out.println(GraphReader.displaySol(gg)[x] );
+				//			System.out.println(GraphReader.displaySol(gg)[x] );
 							   
 							   //System.out.println(Arrays.deepToString(GraphReader.displaySol(gg)));
 							
-						
-					}
+					//	
+					//}
 						System.out.println("\n");
 						System.out.println("Suma wag: " + g +"\n");
 						System.out.println("Czas :" + t + "\n");
@@ -3604,6 +3650,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JToggleButton jToggleButton11;
     private javax.swing.JToggleButton jToggleButton12;
     private javax.swing.JToggleButton jToggleButton3;
+    private javax.swing.JToggleButton jToggleButton1;
     private javax.swing.JToggleButton jToggleButton4;
     private javax.swing.JToggleButton jToggleButton5;
     private javax.swing.JToggleButton jToggleButton6;
@@ -3627,6 +3674,9 @@ public class MainFrame extends javax.swing.JFrame {
     private int [][] graph4;
     private int [][] graph5;
     
+    private double [] X;
+    private double [] Y;
+
     
     private CoolingSchedule coolSched;
 }

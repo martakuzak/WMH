@@ -31,7 +31,7 @@ public class LambdaParameters {
 	 */
 	public int getNumOfLambdas() {
 		Double d = (lambdaMax - lambdaMin) / lambdaStep;
-		return d.intValue();
+		return (int) Math.round(d);
 	}
 
 	/**
