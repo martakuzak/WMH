@@ -48,8 +48,8 @@ public class Generator {
 				for (int secondV = 1; secondV < VERTEX_PART_NUMBER + 1; ++ secondV) {
 					final Random generator = new Random();
 					final int weight = generator.nextInt(MAX_WEIGHT
-							- MIN_WEIGHT)
-							+ MIN_WEIGHT + 1;
+							- MIN_WEIGHT + 1)
+							+ MIN_WEIGHT;
 					bw.write(firstV + "\t" + secondV + "\t" + weight + "\n");
 				}
 			}

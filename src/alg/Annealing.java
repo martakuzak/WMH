@@ -159,7 +159,6 @@ public class Annealing {
 	 * @return
 	 */
 	private static double updateTemp(double T, CoolingSchedule coolingSchedule, double lambda, int k, double Tmax) {
-		
 		//System.out.print("Update temp " + T + " -> ");
 		switch(coolingSchedule) {
 		case COOLING_LINEAR:

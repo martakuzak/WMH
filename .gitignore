@@ -1,6 +1,7 @@
 bin/
 output/
 multi/
+grafy od 2 do 20/
 .project
 .classpath
 /JavaApplication1/nbproject/private/

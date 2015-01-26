@@ -5,7 +5,8 @@ import java.util.Vector;
 import alg.params.NmaxParameters;
 import alg.params.Parameters;
 import alg.params.LambdaParameters;
-import alg.params.TParamaters;
+import alg.params.TminParameters;
+import alg.params.TmaxParameters;
 
 public class AnnealingTestApi {
 	
@@ -65,11 +66,19 @@ public class AnnealingTestApi {
 	}
 	
 	//piaty tab?
-	public static Vector<Vector<TempResPair>> findSolMultiTempMultiCoolSched(int [][] graph, TParamaters params) {
+	public static Vector<Vector<TempResPair>> findSolMultiTempMinMultiCoolSched(int [][] graph, TminParameters params) {
 		final int numOfTmins = params.getTminNum();
 		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
 		for(int tminIdx = 0; tminIdx < numOfTmins; ++ tminIdx) //po kolei dla wszystkich tmin
 			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(tminIdx)));
+		return results;
+	}
+	
+	public static Vector<Vector<TempResPair>> findSolMultiTempMaxMultiCoolSched(int [][] graph, TmaxParameters params) {
+		final int numOfTmax = params.getTmaxNum();
+		Vector<Vector<TempResPair>> results= new Vector< Vector<TempResPair>>();
+		for(int tmaxIdx = 0; tmaxIdx < numOfTmax; ++ tmaxIdx) //po kolei dla wszystkich tmax
+			results.add(findSolOneGraphOneCoolSched(graph, params.getParameters(tmaxIdx)));
 		return results;
 	}
 }

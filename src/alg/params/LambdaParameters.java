@@ -30,7 +30,7 @@ public class LambdaParameters {
 	 *         lambdaStep
 	 */
 	public int getNumOfLambdas() {
-		Double d = (lambdaMax - lambdaMin) / lambdaStep + 1;
+		Double d = (lambdaMax - lambdaMin) / lambdaStep;
 		return d.intValue();
 	}
 
@@ -44,7 +44,6 @@ public class LambdaParameters {
 	 */
 	public double getLambda(int idx) {
 		double lambda = lambdaMin + idx * lambdaStep;
-		System.out.println("getLambda lambda " + lambda);
 		return (lambda <= lambdaMax) ? lambda : -1;
 	}
 
@@ -55,9 +54,7 @@ public class LambdaParameters {
 	 * @return
 	 */
 	public Parameters getParameters(int lambdaIdx) {
-		System.out.println("lambdaIdx " + lambdaIdx);
 		double lambda = getLambda(lambdaIdx);
-		System.out.println("LAMBDA " + lambda);
 		return (lambda != -1) ? new Parameters(Tmax, Tmin, Nmax,
 				getLambda(lambdaIdx), coolingSchedule) : null;
 	}

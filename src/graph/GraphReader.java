@@ -2,11 +2,20 @@ package graph;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class GraphReader {
 
+	public static int getVpNum(String fileName) throws FileNotFoundException {
+		File file = new File(fileName);
+		Scanner scanner = new Scanner(file);
+		scanner.next(); // VERTEX_PART_NUMBER
+		int vpnumber = scanner.nextInt();
+		return vpnumber;
+	}
+	
 	public static int[][] readFile(int ilosc_wierz, int wag_min, int wag_max)
 			throws FileNotFoundException {
 		String fileName = new String("output/" + ilosc_wierz + "_" + wag_min
@@ -48,13 +57,24 @@ public class GraphReader {
 		}
 		graphs = new int[fileNum][][];
 
-		int idx = 0;
+		int idx = 0; 
+		HashMap<Integer,int[][]> map = new HashMap<Integer,int[][]>(); //te cuda sa po to, zeby posortowac grafy od najmniejszego do najwiekszego :D`
+		int[] vpnums = new int[fileNum];
+		
 		for (final File fileEntry : folder.listFiles()) {
 			if (fileEntry.isFile()) {
-				graphs[idx] = readFile(fileEntry.getAbsolutePath());
+				int vp = getVpNum(fileEntry.getAbsolutePath());
+				map.put(vp, readFile(fileEntry.getAbsolutePath()));
+				vpnums[idx] = vp;
+				//graphs[idx] = readFile(fileEntry.getAbsolutePath());
 				++idx;
 			}
 		}
+		
+		Arrays.sort(vpnums);
+		
+		for(int i = 0; i < idx; ++i)
+			graphs[i] = map.get(vpnums[i]);
 		return graphs;
 	}
 

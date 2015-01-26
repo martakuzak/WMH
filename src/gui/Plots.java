@@ -10,12 +10,12 @@ public class Plots extends JPanel {
   
     final int PAD = 20;
     
-	private int [] dataX ;
-	private int [] dataY;
+	private double [] dataX ;
+	private double [] dataY;
 	private String xlabel;
 	private String ylabel;
 	
-	Plots(int [] dataX, int [] dataY, String xlabel, String ylabel) {
+	Plots(double [] dataX, double [] dataY, String xlabel, String ylabel) {
 		this.dataX = dataX;
 		this.dataY = dataY;
 		this.xlabel = xlabel;
@@ -78,8 +78,8 @@ public class Plots extends JPanel {
         }
     }
  
-    private int getMax(int[] dataX) {
-        int max = -Integer.MAX_VALUE;
+    private double getMax(double[] dataX) {
+        double max = -Integer.MAX_VALUE;
         for(int i = 0; i < dataX.length; i++) {
             if(dataX[i] > max)
                 max = dataX[i];
