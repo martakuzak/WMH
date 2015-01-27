@@ -165,6 +165,8 @@ public class Annealing {
 			T = updateTemp(T, coolingSchedule, lambda, ++tempIdx, Tmax);
 
 		}
+		
+		System.out.println("Algorytm pracowal przez " + tempResPairs.lastElement().getResult().getNanoTime() + " ns");
 
 		return tempResPairs;
 	}

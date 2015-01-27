@@ -12,6 +12,7 @@ import alg.TempResPair;
 import alg.params.LambdaParameters;
 import alg.params.NmaxParameters;
 import alg.params.Parameters;
+import alg.params.TmaxParameters;
 import alg.params.TminParameters;
 
 import java.awt.List;
@@ -1663,9 +1664,6 @@ public class MainFrame extends javax.swing.JFrame {
 						
 						long t = tmpResult.getTimeMean();
 						int  g = tmpResult.getSumMean();
-						//int [][] gg = tmpResult.getGraph();
-						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
-						//tabX3[tmp_idx] = idx;
 						tabX3[0][tmp_idx] = idx;
 						tabX3[1][tmp_idx] = g;	
 						tabTime3[0][tmp_idx] = idx;
@@ -1674,25 +1672,7 @@ public class MainFrame extends javax.swing.JFrame {
 						tabStandDevSum3[1][tmp_idx] = tmpResult.getSumStanDev();
 						tabStandDevTime3[0][tmp_idx] = idx;
 						tabStandDevTime3[1][tmp_idx] = tmpResult.getTimeStanDev();
-						
-								
-						//System.out.println(Arrays.deepToString(gg));
-						//GraphReader.displaySol(gg);
-						  
-				//		jTextPane6.append("Graf dla lambda = " + idx + "\n");
-						
-				//		for (int i = 0; i < gg.length; i++) {
-							 //  System.out.print(GraphReader.displaySol(gg)[i] + ", ");
-				//			   jTextPane6.append(GraphReader.displaySol(graph3)[i] );
-							   
-							   //System.out.println(Arrays.deepToString(GraphReader.displaySol(gg)));
 							
-				//		}
-						
-				//		jTextPane6.append("\n");
-				//		jTextPane6.append("Suma wag: " + g +"\n");
-				//		jTextPane6.append("Czas :" + t + "\n");
-				//		
 						
 						tmp_idx ++;
 					}
@@ -2956,74 +2936,46 @@ public class MainFrame extends javax.swing.JFrame {
 					}
 				
 						
-					
-					int TStep = 0;
-					
-					
-					
-					for (double i =  Tmin_min; i < Tmin_max; ++i) {
-						
-							if (jRadioButton10.isSelected()) {
-								TStep = (int) ((Tmax_min- i )/lambda) + 1;
-							}
-							if (jRadioButton11.isSelected()) {
-								TStep = (int) (Math.log(lambda) * (i/Tmax_min)) + 1;  
-							}
-							if (jRadioButton12.isSelected()) {
-								TStep = (int) (Math.exp(Tmax_min/ i )) +1;
-							}
 							
 							
 				
 					
-					TminParameters params = new TminParameters(Tmax_min, Tmin_max, Tmin_min, nmax, TStep, lambda, coolSched);
+					TminParameters params = new TminParameters(Tmax_min, Tmin_max, Tmin_min, 1, nmax, lambda, coolSched);
 					
 					
 					
-					double [][] tabX5 = new double[2][params.getTminNum()];                        // punkty na os X
-					//double [] tabY5 = new double[params.getTminNum()];
+					double [][] tabX5 = new double[2][params.getTminNum()];  
 					double [][] tabTime5 = new double[2][params.getTminNum()];
+					
+					double[][] tabStandDevSum5 = new double[2][params.getTminNum()];
+					double[][] tabStandDevTime5 = new double[2][params.getTminNum()];
+					
 					
 					
 					Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiTempMinMultiCoolSched(graph5, params);
 					
 					int tmp_idx = 0;
-					for (double idx = Tmin_min ; idx < Tmin_max ; idx += TStep) {
+					for (double idx = Tmin_min ; idx <= Tmin_max ; idx ++) {
 						ResultStats tmpResult = wyniki.get(tmp_idx);
 						//wynik dla Tmin:
 						long t = tmpResult.getTimeMean();
 						int  g = tmpResult.getSumMean();
-						//int [][] gg = tmpResult.getGraph();
-						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
 						tabX5[0][tmp_idx] = idx;
 						tabX5[1][tmp_idx] = g;
-						//tabY5[tmp_idx] = g;	
+							
 						tabTime5[0][tmp_idx] = idx;
 						tabTime5[1][tmp_idx] = t;
-								
-						//System.out.println(Arrays.deepToString(gg));
-						//GraphReader.displaySol(gg);
-						  
-						System.out.println("Graf dla temp min = " + idx + "\n");
 						
-			//			for (int x = 0; x < gg.length; x++) {
-							 //  System.out.print(GraphReader.displaySol(gg)[i] + ", ");
-				//			System.out.println(GraphReader.displaySol(gg)[x] );
-							   
-							   //System.out.println(Arrays.deepToString(GraphReader.displaySol(gg)));
-							
-					//	
-					//}
-						System.out.println("\n");
-						System.out.println("Suma wag: " + g +"\n");
-						System.out.println("Czas :" + t + "\n");
-						
+						tabStandDevSum5[0][tmp_idx] = idx;
+						tabStandDevSum5[1][tmp_idx] = tmpResult.getSumStanDev();
+						tabStandDevTime5[0][tmp_idx] = idx;
+						tabStandDevTime5[1][tmp_idx] = tmpResult.getTimeStanDev();
 						
 						tmp_idx ++;
 					}
 					
 					
-	                JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych T min");
+	                JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych wartosci temperatury zamrazania");
 	                Plot2DPanel plot = new Plot2DPanel();        
 	                // add a line plot to the PlotPanel
 	                plot.addLinePlot("my plot", coolSched.getColor(), tabX5);
@@ -3035,7 +2987,20 @@ public class MainFrame extends javax.swing.JFrame {
 	                f.setLocationRelativeTo(null);
 	                f.setVisible(true);
 	                
-	                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu od T min");
+	                
+	                JFrame standDevSumFrame = new JFrame("Zale¿noœæ odchylenia standardowego sumy wag dla ró¿nych wartoœci temperatury zamrazania");
+	                Plot2DPanel sDSPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDSPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevSum5);
+	                sDSPlot.setAxisLabel(0, "T min");
+	                sDSPlot.setAxisLabel(1, "odchylenie standardowe sumy wag");
+	                standDevSumFrame.add(sDSPlot);              
+	                standDevSumFrame.setSize(800,600);
+	                standDevSumFrame.setLocationRelativeTo(null);
+	                standDevSumFrame.setVisible(true);
+	                
+	                
+	                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu od wartosci temperatury zamrazania");
 	                Plot2DPanel plot2 = new Plot2DPanel();        
 	                // add a line plot to the PlotPanel
 	                plot2.addLinePlot("my plot", coolSched.getColor(), tabTime5);
@@ -3047,7 +3012,164 @@ public class MainFrame extends javax.swing.JFrame {
 	                f2.setLocationRelativeTo(null);
 	                f2.setVisible(true);
 	
-					}}
+	                
+	                JFrame standDevTimeFrame = new JFrame("Zale¿noœæ odchylenia standardowego czasu pracy algorytmu dla ró¿nych wartoœci temperatury zamrazania");
+	                Plot2DPanel sDTPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDTPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevTime5);
+	                sDTPlot.setAxisLabel(0, "T min");
+	                sDTPlot.setAxisLabel(1, "odchylenie standardowe czasu [ns]");
+	                standDevTimeFrame.add(sDTPlot);              
+	                standDevTimeFrame.setSize(800,600);
+	                standDevTimeFrame.setLocationRelativeTo(null);
+	                standDevTimeFrame.setVisible(true);
+	                
+	                
+	                
+					}
+					
+					
+					
+					
+					
+					if (jRadioButton2.isSelected()) {
+						
+						
+						jTextField35.setEnabled(false);
+						
+	                	 Tmax_max = Double.parseDouble(jTextField34.getText());
+	                	 Tmax_min = Double.parseDouble(jTextField23.getText());
+	                	// Tmin_max = Double.parseDouble(jTextField35.getText());
+	                	 Tmin_min = Double.parseDouble(jTextField24.getText());
+						
+					if(Tmin_min < 1) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Temperatura minimalna powinna wynosic co najmniej 1",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(Tmax_min < 1) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Temperatura minimalna powinna wynosic co najmniej 1",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				
+					if(Tmax_max > 100) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Temperatura maksymalna to 100",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if(Tmax_max < Tmax_min) {
+						javax.swing.JOptionPane.showMessageDialog(getParent(), 
+								"Maksymalna temperatura nie moze byc mniejsza od minimalnej",
+								"Blad",
+								JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+				
+						
+							
+							
+				
+					
+					TmaxParameters params = new TmaxParameters(Tmin_min, Tmax_max, Tmax_min, 1, nmax, lambda, coolSched);
+					
+					
+					
+					double [][] tabX5 = new double[2][params.getTmaxNum()];  
+					double [][] tabTime5 = new double[2][params.getTmaxNum()];
+					
+					double[][] tabStandDevSum5 = new double[2][params.getTmaxNum()];
+					double[][] tabStandDevTime5 = new double[2][params.getTmaxNum()];
+					
+					
+					
+					Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiTempMaxMultiCoolSched(graph5, params);
+					
+					int tmp_idx = 0;
+					for (double idx = Tmax_min ; idx <= Tmax_max ; idx ++) {
+						ResultStats tmpResult = wyniki.get(tmp_idx);
+						//wynik dla Tmin:
+						long t = tmpResult.getTimeMean();
+						int  g = tmpResult.getSumMean();
+						tabX5[0][tmp_idx] = idx;
+						tabX5[1][tmp_idx] = g;
+							
+						tabTime5[0][tmp_idx] = idx;
+						tabTime5[1][tmp_idx] = t;
+						
+						tabStandDevSum5[0][tmp_idx] = idx;
+						tabStandDevSum5[1][tmp_idx] = tmpResult.getSumStanDev();
+						tabStandDevTime5[0][tmp_idx] = idx;
+						tabStandDevTime5[1][tmp_idx] = tmpResult.getTimeStanDev();
+						
+						tmp_idx ++;
+					}
+					
+					
+	                JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych wartosci temperatury poczatkowej");
+	                Plot2DPanel plot = new Plot2DPanel();        
+	                // add a line plot to the PlotPanel
+	                plot.addLinePlot("my plot", coolSched.getColor(), tabX5);
+	                plot.setAxisLabel(0, "T max");
+	                plot.setAxisLabel(1, "czas [ns]");
+	                f.add(plot);
+	                //f.add( new Plots(tabY5, tabX5, "ilosc temp min", "suma wag"));                
+	                f.setSize(800,600);
+	                f.setLocationRelativeTo(null);
+	                f.setVisible(true);
+	                
+	                
+	                JFrame standDevSumFrame = new JFrame("Zale¿noœæ odchylenia standardowego sumy wag dla ró¿nych wartoœci temperatury poczatkowej");
+	                Plot2DPanel sDSPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDSPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevSum5);
+	                sDSPlot.setAxisLabel(0, "T max");
+	                sDSPlot.setAxisLabel(1, "odchylenie standardowe sumy wag");
+	                standDevSumFrame.add(sDSPlot);              
+	                standDevSumFrame.setSize(800,600);
+	                standDevSumFrame.setLocationRelativeTo(null);
+	                standDevSumFrame.setVisible(true);
+	                
+	                
+	                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu od wartosci temperatury poczatkowej");
+	                Plot2DPanel plot2 = new Plot2DPanel();        
+	                // add a line plot to the PlotPanel
+	                plot2.addLinePlot("my plot", coolSched.getColor(), tabTime5);
+	                plot2.setAxisLabel(0, "T max");
+	                plot2.setAxisLabel(1, "czas [ns]");
+	                f2.add(plot2);
+	                //f2.add( new Plots(tabTime5, tabX5, "ilosc temp min", "czas [ns]"));                
+	                f2.setSize(800,600);
+	                f2.setLocationRelativeTo(null);
+	                f2.setVisible(true);
+	
+	                
+	                JFrame standDevTimeFrame = new JFrame("Zale¿noœæ odchylenia standardowego czasu pracy algorytmu dla ró¿nych wartoœci temperatury poczatkowej");
+	                Plot2DPanel sDTPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDTPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevTime5);
+	                sDTPlot.setAxisLabel(0, "T max");
+	                sDTPlot.setAxisLabel(1, "odchylenie standardowe czasu [ns]");
+	                standDevTimeFrame.add(sDTPlot);              
+	                standDevTimeFrame.setSize(800,600);
+	                standDevTimeFrame.setLocationRelativeTo(null);
+	                standDevTimeFrame.setVisible(true);
+	                
+	                
+	                
+					}
+					
+					
+					
+					
+					
+					
 					}
 					
                 
