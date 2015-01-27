@@ -24,7 +24,7 @@ public class AnnealingTestApi {
 	/**
 	 * Liczba iteracji dla jednego rozwi¹zania - do uœredniania wykresów.
 	 */
-	private static final int NUM_OF_ITERATIONS = 20;
+	private static final int NUM_OF_ITERATIONS = 50;
 
 	// pierwszy tab
 	/**

@@ -1,4 +1,4 @@
 WMH
 ===
 
-Simulated annealing algorithm for bipartitional weighted graph ration
+Algorytm symulowanego wyżarzania do rozwiązania problemu przydziału w symetrycznym dwudzielnym grafie ważonym.

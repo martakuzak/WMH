@@ -166,8 +166,6 @@ public class Annealing {
 
 		}
 		
-		System.out.println("Algorytm pracowal przez " + tempResPairs.lastElement().getResult().getNanoTime() + " ns");
-
 		return tempResPairs;
 	}
 
