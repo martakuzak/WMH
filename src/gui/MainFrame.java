@@ -1079,9 +1079,8 @@ public class MainFrame extends javax.swing.JFrame {
 				
 				Parameters params = new Parameters(Tmax, Tmin, Nmax, lambda, coolSched);
 				
-				double [][] tabX2 = new double[2][graphs2.length];                        // punkty na os X
-				//double [] tabY2 = new double[graphs2.length];
 				double[][] tabTime2 = new double[2][graphs2.length];
+				double[][] tabTimeStandDev2 = new double[2][graphs2.length];
 				
 				Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiGraphsMultiCoolSched(graphs2, params);
 				
@@ -1095,23 +1094,12 @@ public class MainFrame extends javax.swing.JFrame {
 					long t = tmpResult.getTimeMean();
 					int  g = tmpResult.getSumMean();
 					//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
-					tabX2[0][tmp_idx] = 2*tmpResult.getGraphSize(); //rozmiar grafu
-					tabX2[1][tmp_idx] = g;	
-					tabTime2[0][tmp_idx] = 2*tmpResult.getGraphSize();
+					tabTime2[0][tmp_idx] = 2*tmpResult.getGraphSize(); //razy 2, bo to rozmiar tylko jednego przedzialu grafu
 					tabTime2[1][tmp_idx] = t;
-							
-					//System.out.println(Arrays.deepToString(gg));
-					//GraphReader.displaySol(gg);
+					tabTimeStandDev2[0][tmp_idx] = 2*tmpResult.getGraphSize();
+					tabTimeStandDev2[1][tmp_idx] = tmpResult.getTimeStanDev();
 					  
 				//	jTextPane4.append("Graf dla ilosci wierzcholkow= " + (2*gg.length) + "\n");
-					
-				//	for (int i = 0; i < gg.length; i++) {
-						 //  System.out.print(GraphReader.displaySol(gg)[i] + ", ");
-						  // jTextPane4.append(GraphReader.displaySol(gg)[i] );
-						   
-						   //System.out.println(Arrays.deepToString(GraphReader.displaySol(gg)));
-						
-				//	}
 					
 				//	jTextPane4.append("\n");
 				//	jTextPane4.append("Suma wag: " + g +"\n");
@@ -1121,30 +1109,27 @@ public class MainFrame extends javax.swing.JFrame {
 					tmp_idx ++;
 				}
 				  
-				
-              //  JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych rozmiarów grafów");
-                Plot2DPanel plot = new Plot2DPanel();           
-                // add a line plot to the PlotPanel
-                plot.addLinePlot("my plot", coolSched.getColor(), tabX2);
-                plot.setAxisLabel(0, "n");
-                plot.setAxisLabel(1, "suma wag");
-            //    f.add(plot);
-                //f.add( new Plots(tabY2, tabX2, "rozmiar grafu", "suma wag"));                
-             //   f.setSize(800,600);
-             //   f.setLocationRelativeTo(null);
-            //    f.setVisible(true);
-                
-                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu dla ró¿nych rozmiarów grafów");
+                JFrame f2 = new JFrame("Zale¿noœæ œredniego czasu pracy algorytmu dla ró¿nych rozmiarów grafów");
                 Plot2DPanel plot2 = new Plot2DPanel();     
                 // add a line plot to the PlotPanel
                 plot2.addLinePlot("my plot", coolSched.getColor(), tabTime2);
                 plot2.setAxisLabel(0, "n");
                 plot2.setAxisLabel(1, "czas [ns]");
-                f2.add(plot2);
-                //f2.add( new Plots(tabTime2, tabX2, "rozmiar grafu", "czas [ns]"));                
+                f2.add(plot2);            
                 f2.setSize(800,600);
                 f2.setLocationRelativeTo(null);
                 f2.setVisible(true);
+                
+                JFrame standDevFrame = new JFrame("Zale¿noœæ odchylenia standardowego czasu pracy algorytmu dla ró¿nych rozmiarów grafów");
+                Plot2DPanel sDPlot = new Plot2DPanel();     
+                // add a line plot to the PlotPanel
+                sDPlot.addLinePlot("my plot", coolSched.getColor(), tabTimeStandDev2);
+                sDPlot.setAxisLabel(0, "n");
+                sDPlot.setAxisLabel(1, "odchylenie standardowe czasu [ns]");
+                standDevFrame.add(sDPlot);              
+                standDevFrame.setSize(800,600);
+                standDevFrame.setLocationRelativeTo(null);
+                standDevFrame.setVisible(true);
 
 
         }
@@ -1666,11 +1651,13 @@ public class MainFrame extends javax.swing.JFrame {
 					double [][] tabX3 = new double[2][params.getNumOfLambdas()];                        // punkty na os X
 					//double [] tabY3 = new double[params.getNumOfLambdas()];
 					double[][] tabTime3 = new double[2][params.getNumOfLambdas()];
+					double[][] tabStandDevSum3 = new double[2][params.getNumOfLambdas()];
+					double[][] tabStandDevTime3 = new double[2][params.getNumOfLambdas()];
 					
 					Vector<ResultStats >  wyniki = AnnealingTestApi.findSolMultiLambdaMultiCoolSched(graph3, params);
 					
 					int tmp_idx = 0;
-					for (double idx = lambda_min ; idx < lambda_max ; idx += lambda_step) {
+					for (double idx = lambda_min ; idx <= lambda_max ; idx += lambda_step) {
 						
 						ResultStats tmpResult = wyniki.get(tmp_idx);
 						
@@ -1683,6 +1670,11 @@ public class MainFrame extends javax.swing.JFrame {
 						tabX3[1][tmp_idx] = g;	
 						tabTime3[0][tmp_idx] = idx;
 						tabTime3[1][tmp_idx] = t;
+						tabStandDevSum3[0][tmp_idx] = idx;
+						tabStandDevSum3[1][tmp_idx] = tmpResult.getSumStanDev();
+						tabStandDevTime3[0][tmp_idx] = idx;
+						tabStandDevTime3[1][tmp_idx] = tmpResult.getTimeStanDev();
+						
 								
 						//System.out.println(Arrays.deepToString(gg));
 						//GraphReader.displaySol(gg);
@@ -1706,7 +1698,7 @@ public class MainFrame extends javax.swing.JFrame {
 					}
 					  
 					
-	                JFrame f = new JFrame("Znalezione sumy wag dla ró¿nych wartosci lambda");
+	                JFrame f = new JFrame("Znalezione œrednie sumy wag dla ró¿nych wartosci lambda");
 	                Plot2DPanel plot = new Plot2DPanel();        
 	                // add a line plot to the PlotPanel
 	                plot.addLinePlot("my plot", coolSched.getColor(), tabX3);
@@ -1719,6 +1711,17 @@ public class MainFrame extends javax.swing.JFrame {
 	                f.setLocationRelativeTo(null);
 	                f.setVisible(true);
 	                
+	                JFrame standDevSumFrame = new JFrame("Zale¿noœæ odchylenia standardowego sumy wag dla ró¿nych wartoœci lambda");
+	                Plot2DPanel sDSPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDSPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevSum3);
+	                sDSPlot.setAxisLabel(0, "lambda");
+	                sDSPlot.setAxisLabel(1, "odchylenie standardowe sumy wag");
+	                standDevSumFrame.add(sDSPlot);              
+	                standDevSumFrame.setSize(800,600);
+	                standDevSumFrame.setLocationRelativeTo(null);
+	                standDevSumFrame.setVisible(true);
+	                
 	                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu od wartosci lambda");
 	                Plot2DPanel plot2 = new Plot2DPanel();        
 	                // add a line plot to the PlotPanel
@@ -1730,6 +1733,17 @@ public class MainFrame extends javax.swing.JFrame {
 	                f2.setSize(800,600);
 	                f2.setLocationRelativeTo(null);
 	                f2.setVisible(true);
+	                
+	                JFrame standDevTimeFrame = new JFrame("Zale¿noœæ odchylenia standardowego czasu pracy algorytmu dla ró¿nych wartoœci lambda");
+	                Plot2DPanel sDTPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDTPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevTime3);
+	                sDTPlot.setAxisLabel(0, "lambda");
+	                sDTPlot.setAxisLabel(1, "odchylenie standardowe czasu [ns]");
+	                standDevTimeFrame.add(sDTPlot);              
+	                standDevTimeFrame.setSize(800,600);
+	                standDevTimeFrame.setLocationRelativeTo(null);
+	                standDevTimeFrame.setVisible(true);
 	
 	
             }
@@ -2246,44 +2260,28 @@ public class MainFrame extends javax.swing.JFrame {
 					
 					NmaxParameters params = new NmaxParameters(Tmax, Tmin, nmax_max, nmax_min, lambda, nmax_step, coolSched);
 
-					double  [][] tabX4 = new double[2][params.getNmaxNum()];                        // punkty na os X
-					//double [] tabY4 = new double[params.getNmaxNum()];
+					double  [][] tabX4 = new double[2][params.getNmaxNum()]; 
 					double [][] tabTime4 = new double[2][params.getNmaxNum()];
+					double [][] tabStandDevSum4 = new double[2][params.getNmaxNum()];
+					double [][] tabStandDevTime4 = new double[2][params.getNmaxNum()];
 					
 					Vector<ResultStats>  wyniki = AnnealingTestApi.findSolMultiNmaxMultiCoolSched(graph4, params);
 					
 					int tmp_idx = 0;
-					for (int idx = nmax_min ; idx < nmax_max ; idx += nmax_step) {
+					for (int idx = nmax_min ; idx <= nmax_max ; idx += nmax_step) {
 						ResultStats tmpResult = wyniki.get(tmp_idx);
-						//wynik dla Tmin:
-						
+
 						long t = tmpResult.getTimeMean();
 						int  g = tmpResult.getSumMean();
-						//int [][] gg = tmpResult.getGraph();
-						//jTextPane10.append(Arrays.deepToString(gg)+ "\n");
 						tabX4[0][tmp_idx] = idx;
 						tabX4[1][tmp_idx] = g;	
 						tabTime4[0][tmp_idx] = idx;
 						tabTime4[1][tmp_idx]=  t;
-								
-						//System.out.println(Arrays.deepToString(gg));
-						//GraphReader.displaySol(gg);
-						  
-						//jTextPane10.append("Graf dla N = " + idx + "\n");
-						
-						//for (int i = 0; i < gg.length; i++) {
-							 //  System.out.print(GraphReader.displaySol(gg)[i] + ", ");
-						//	   jTextPane10.append(GraphReader.displaySol(gg)[i] );
-							   
-							   //System.out.println(Arrays.deepToString(GraphReader.displaySol(gg)));
-							
-					//	}
-						
-					//	jTextPane10.append("\n");
-					//	jTextPane10.append("Suma wag: " + g +"\n");
-					//	jTextPane10.append("Czas :" + t + "\n");
-						
-						
+						tabStandDevSum4[0][tmp_idx] = idx;
+						tabStandDevSum4[1][tmp_idx] = tmpResult.getSumStanDev();
+						tabStandDevTime4[0][tmp_idx] = idx;
+						tabStandDevTime4[1][tmp_idx] = tmpResult.getTimeStanDev();
+										
 						tmp_idx ++;
 					}
 					  
@@ -2301,6 +2299,17 @@ public class MainFrame extends javax.swing.JFrame {
 	                f.setLocationRelativeTo(null);
 	                f.setVisible(true);
 	                
+	                JFrame standDevSumFrame = new JFrame("Zale¿noœæ odchylenia standardowego sumy wag dla ró¿nych wartoœci N");
+	                Plot2DPanel sDSPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDSPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevSum4);
+	                sDSPlot.setAxisLabel(0, "N");
+	                sDSPlot.setAxisLabel(1, "odchylenie standardowe sumy wag");
+	                standDevSumFrame.add(sDSPlot);              
+	                standDevSumFrame.setSize(800,600);
+	                standDevSumFrame.setLocationRelativeTo(null);
+	                standDevSumFrame.setVisible(true);
+	                
 	                JFrame f2 = new JFrame("Zaleznosc czasu pracy algorytmu od wartosci N");
 	                Plot2DPanel plot2 = new Plot2DPanel();        
 	                // add a line plot to the PlotPanel
@@ -2312,6 +2321,17 @@ public class MainFrame extends javax.swing.JFrame {
 	                f2.setSize(800,600);
 	                f2.setLocationRelativeTo(null);
 	                f2.setVisible(true);
+	                
+	                JFrame standDevTimeFrame = new JFrame("Zale¿noœæ odchylenia standardowego sumy wag dla ró¿nych wartoœci N");
+	                Plot2DPanel sDTPlot = new Plot2DPanel();     
+	                // add a line plot to the PlotPanel
+	                sDTPlot.addLinePlot("my plot", coolSched.getColor(), tabStandDevSum4);
+	                sDTPlot.setAxisLabel(0, "N");
+	                sDTPlot.setAxisLabel(1, "odchylenie standardowe czasu [ns]");
+	                standDevTimeFrame.add(sDTPlot);              
+	                standDevTimeFrame.setSize(800,600);
+	                standDevTimeFrame.setLocationRelativeTo(null);
+	                standDevTimeFrame.setVisible(true);
 	
 	
 	

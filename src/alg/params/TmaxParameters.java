@@ -28,7 +28,7 @@ public class TmaxParameters {
 
 	public int getTmaxNum() {
 		Double d = (TmaxMax - TmaxMin) / TStep;
-		return (int) Math.round(d);
+		return d.intValue() + 1;
 	}
 
 	public double getTmax(int idx) {

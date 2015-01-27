@@ -25,7 +25,7 @@ public class NmaxParameters {
 	}
 
 	public int getNmaxNum() {
-		return (NmaxMax - NmaxMin) / NmaxStep ;
+		return (NmaxMax - NmaxMin) / NmaxStep + 1;
 	}
 
 	public int getNmax(int idx) {
